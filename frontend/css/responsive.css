@@ -1,0 +1,219 @@
+/**
+ * NRSLJ SPECIALITY HOSPITALS, MUSIRI
+ * Responsive Breakpoints & Mobile Touch Optimizations
+ * Supports: 320px, 360px, 375px, 390px, 430px, 768px, 1024px, 1280px, 1920px
+ */
+
+/* ==========================================================================
+   Mobile Devices (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 56px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .main-content {
+    padding: var(--space-md);
+    height: calc(100vh - var(--header-height));
+  }
+
+  /* Hamburger toggle button */
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  /* App sidebar becomes off-canvas drawer */
+  .app-sidebar {
+    position: fixed;
+    top: var(--header-height);
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    height: calc(100vh - var(--header-height));
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop.active {
+    display: block;
+  }
+
+  /* Brand title scale down */
+  .brand-title {
+    font-size: 0.9rem;
+  }
+  .brand-subtitle {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  .brand-logo-img {
+    height: 36px;
+  }
+
+  /* Form layouts: stack into single column */
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .form-row > .form-group {
+    min-width: 100%;
+  }
+
+  .radio-group, .checkbox-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Grid columns stack */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stat cards */
+  .stat-card {
+    padding: var(--space-md);
+  }
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Buttons on mobile */
+  .btn {
+    width: 100%;
+  }
+  .header-actions .btn {
+    width: auto;
+  }
+  .card-footer {
+    flex-direction: column-reverse;
+    gap: var(--space-sm);
+  }
+  .card-footer .btn {
+    width: 100%;
+  }
+
+  /* Modal Dialog fits mobile screens */
+  .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 85vh;
+    align-self: flex-end;
+  }
+
+  .modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  /* Tables: Controlled horizontal scroll or card view */
+  .table-responsive-cards thead {
+    display: none;
+  }
+
+  .table-responsive-cards tbody,
+  .table-responsive-cards tr,
+  .table-responsive-cards td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-responsive-cards tr {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table-responsive-cards td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+  }
+
+  .table-responsive-cards td:last-child {
+    border-bottom: none;
+  }
+
+  .table-responsive-cards td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-align: left;
+    margin-right: var(--space-md);
+  }
+}
+
+/* ==========================================================================
+   Small Mobile Screens (<= 375px)
+   ========================================================================== */
+@media (max-width: 375px) {
+  .brand-text-container {
+    display: none; /* Only show logo emblem on very small screens (320px - 360px) */
+  }
+
+  .user-profile-badge span {
+    display: none;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ==========================================================================
+   Tablets (769px to 1024px)
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-menu-btn {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Desktop & Wide (>= 1025px)
+   ========================================================================== */
+@media (min-width: 1025px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+
+  .main-content {
+    max-width: 1600px;
+  }
+}

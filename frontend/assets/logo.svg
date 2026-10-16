@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="nrsljGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f2942" />
+      <stop offset="60%" stop-color="#0d9488" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Hospital Shield / Cross Emblem -->
+  <g transform="translate(10, 10)" filter="url(#shadow)">
+    <!-- Outer Shield -->
+    <path d="M30 0 C45 0, 60 8, 60 22 C60 45, 30 58, 30 58 C30 58, 0 45, 0 22 C0 8, 15 0, 30 0 Z" fill="url(#nrsljGrad)" />
+    <!-- White Medical Cross -->
+    <path d="M25 14 H35 V24 H45 V34 H35 V44 H25 V34 H15 V24 H25 Z" fill="#ffffff" />
+    <!-- Heartbeat pulse through the cross -->
+    <path d="M12 29 H22 L26 21 L31 38 L35 26 L38 29 H48" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(80, 22)">
+    <text x="0" y="16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="800" fill="#0f2942" letter-spacing="0.5">
+      NRSLJ SPECIALITY HOSPITALS
+    </text>
+    <text x="0" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0d9488" letter-spacing="3.5">
+      MUSIRI &bull; LEAVE PORTAL
+    </text>
+  </g>
+</svg>
