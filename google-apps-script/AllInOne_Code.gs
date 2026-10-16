@@ -1202,10 +1202,14 @@ function getEmployeeBalances(employeeId, leaveYear) {
  */
 function applyBalanceTransaction(employeeId, leaveTypeId, requestId, transactionType, amount, reason, createdBy, idempotencyKey) {
   var lock = LockService.getScriptLock();
+  var lockAcquired = false;
   try {
-    var success = lock.waitLock(CONFIG.LOCK_TIMEOUT_MS);
-    if (!success) {
-      throw new Error('Server busy: Could not obtain lock for balance update. Please try again.');
+    if (!lock.hasLock()) {
+      var ok = lock.tryLock(CONFIG.LOCK_TIMEOUT_MS || 10000);
+      if (!ok) {
+        throw new Error('Server busy: Could not obtain lock for balance update. Please try again.');
+      }
+      lockAcquired = true;
     }
 
     // 1. Check idempotency
@@ -1281,7 +1285,15 @@ function applyBalanceTransaction(employeeId, leaveTypeId, requestId, transaction
     };
 
   } finally {
-    lock.releaseLock();
+    if (lockAcquired) {
+      try {
+        if (lock.hasLock()) {
+          lock.releaseLock();
+        }
+      } catch (lockErr) {
+        Logger.log('Warning releasing lock in applyBalanceTransaction: ' + lockErr);
+      }
+    }
   }
 }
 
@@ -1812,10 +1824,14 @@ function processApprovalDecision(sessionUser, requestId, decision, comment) {
   }
 
   var lock = LockService.getScriptLock();
+  var lockAcquired = false;
   try {
-    var hasLock = lock.waitLock(CONFIG.LOCK_TIMEOUT_MS);
-    if (!hasLock) {
-      throw new Error('Server busy: could not acquire lock for approval transaction. Please retry.');
+    if (!lock.hasLock()) {
+      var ok = lock.tryLock(CONFIG.LOCK_TIMEOUT_MS || 10000);
+      if (!ok) {
+        throw new Error('Server busy: could not acquire lock for approval transaction. Please retry.');
+      }
+      lockAcquired = true;
     }
 
     // 1. Fetch current request state fresh from sheet to prevent race conditions
@@ -1957,7 +1973,15 @@ function processApprovalDecision(sessionUser, requestId, decision, comment) {
     };
 
   } finally {
-    lock.releaseLock();
+    if (lockAcquired) {
+      try {
+        if (lock.hasLock()) {
+          lock.releaseLock();
+        }
+      } catch (lockErr) {
+        Logger.log('Warning releasing lock in processApprovalDecision: ' + lockErr);
+      }
+    }
   }
 }
 
