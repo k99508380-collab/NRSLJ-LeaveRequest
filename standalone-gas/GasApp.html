@@ -2323,6 +2323,8 @@ window.NRSLJ_AUTH_VIEW = (function() {
     var hospitalName = settings.HOSPITAL_NAME || window.NRSLJ_CONFIG.HOSPITAL_NAME;
 
     var activeTab = initialTab || 'login';
+    var isGas = window.NRSLJ_API && window.NRSLJ_API.isGasEnvironment();
+    var hasBackend = isGas || (window.NRSLJ_CONFIG && window.NRSLJ_CONFIG.getWebAppUrl() && window.NRSLJ_CONFIG.getWebAppUrl().trim().length > 0);
 
     var html = '' +
       '<div style="max-width: 480px; margin: 40px auto; width: 100%;">' +
@@ -2334,6 +2336,16 @@ window.NRSLJ_AUTH_VIEW = (function() {
           '</div>' +
 
           '<div class="card-body" style="padding: 28px 32px;">' +
+            (!hasBackend ?
+              '<div class="alert alert-warning text-xs mb-md" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">' +
+                '<div class="flex items-center gap-xs">' +
+                  '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' +
+                  '<span><strong>Backend Not Connected:</strong> Google Apps Script URL needed.</span>' +
+                '</div>' +
+                '<button type="button" class="btn btn-navy btn-sm" id="auth-config-backend-btn" style="padding: 4px 10px; font-size: 0.75rem;">Connect URL</button>' +
+              '</div>'
+              : ''
+            ) +
             // Tab switcher
             '<div class="tabs-nav" style="justify-content: center; margin-bottom: 24px;">' +
               '<button type="button" class="tab-btn' + (activeTab === 'login' ? ' active' : '') + '" id="auth-tab-login" style="flex: 1; text-align: center;">Sign In</button>' +
@@ -2515,6 +2527,13 @@ window.NRSLJ_AUTH_VIEW = (function() {
           btn.innerHTML = '<span>Submit Registration</span>';
         });
     });
+
+    var configBackendBtn = document.getElementById('auth-config-backend-btn');
+    if (configBackendBtn) {
+      configBackendBtn.addEventListener('click', function() {
+        window.NRSLJ_STATE.setRoute('diagnostics');
+      });
+    }
   }
 
   function escapeHtml(text) {
