@@ -7,6 +7,7 @@ var CONFIG = {
   HOSPITAL_NAME: 'NRSLJ SPECIALITY HOSPITALS, MUSIRI',
   DEFAULT_LEAVE_YEAR: new Date().getFullYear(),
   DEFAULT_LOGO_URL: '', // Can be customized in HospitalSettings
+  SPREADSHEET_ID: '1b1gSN-D-P-zbcqt1WQ7Cx4fmpr1LCSkyY7pUJ3cmJF8',
   SESSION_EXPIRATION_HOURS: 24,
   MAX_LOGIN_ATTEMPTS: 5,
   LOCK_TIMEOUT_MS: 30000, // 30s lock for critical transactions
@@ -142,13 +143,13 @@ var CONFIG = {
  */
 function getSpreadsheet() {
   var props = PropertiesService.getScriptProperties();
-  var configuredId = props.getProperty('SPREADSHEET_ID');
+  var configuredId = props.getProperty('SPREADSHEET_ID') || CONFIG.SPREADSHEET_ID;
 
   if (configuredId && configuredId.trim().length > 0) {
     try {
       return SpreadsheetApp.openById(configuredId.trim());
     } catch (e) {
-      throw new Error('Configured SPREADSHEET_ID is invalid or inaccessible: ' + e.message);
+      Logger.log('Could not open spreadsheet by ID: ' + e.message);
     }
   }
 
@@ -159,7 +160,7 @@ function getSpreadsheet() {
     // Standalone script without active spreadsheet
   }
 
-  throw new Error('No Google Spreadsheet linked. Set "SPREADSHEET_ID" in Script Properties or link the script to a Google Sheet.');
+  throw new Error('No Google Spreadsheet linked. Ensure spreadsheet ID "1b1gSN-D-P-zbcqt1WQ7Cx4fmpr1LCSkyY7pUJ3cmJF8" is accessible.');
 }
 
 /**
