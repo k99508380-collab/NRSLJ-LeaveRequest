@@ -222,6 +222,11 @@ function handleApiAction(action, sessionToken, data) {
     return createSuccessResponse(metrics, 'Dashboard metrics retrieved');
   }
 
+  if (action === 'getStaffOnLeaveByDate') {
+    var dateResult = getStaffOnLeaveByDate(sessionUser, data.date);
+    return createSuccessResponse(dateResult, 'Staff absences retrieved for date');
+  }
+
   // ==========================================
   // 4. ADMIN/HR ONLY ACTIONS
   // ==========================================

@@ -165,58 +165,33 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
 
     html += '</div></div>';
 
-    // Staff On Leave Today Section (Expanded Cards)
-    html += '<div class="card">' +
-      '<div class="card-header">' +
-        '<div>' +
-          '<div class="card-title">Hospital Staff on Leave Today</div>' +
-          '<div class="card-subtitle">Active absences across departments for duty roster planning &bull; ' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
-        '</div>' +
-        '<span class="badge badge-teal" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' + (metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + ' On Leave</span>' +
-      '</div>' +
-      '<div class="card-body" style="padding: 20px;">';
-
-    var onLeave = metrics.onLeaveToday || [];
-    if (onLeave.length === 0) {
-      html += '' +
-        '<div class="text-center text-muted" style="padding: 36px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
-          '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
-          '<div style="font-weight: 600; color: var(--color-text-main);">All Hospital Staff on Duty Today</div>' +
-          '<p class="text-sm text-muted" style="margin-top: 4px;">No approved leaves recorded for today. Full staffing across all hospital departments.</p>' +
-        '</div>';
-    } else {
-      html += '<div class="staff-on-leave-grid">';
-      for (var j = 0; j < onLeave.length; j++) {
-        var ol = onLeave[j];
-        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
-        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
-        var isSingleDay = sDate === eDate;
-        var dateRange = isSingleDay ? sDate : (sDate + ' to ' + eDate);
-
-        html += '' +
-          '<div class="staff-on-leave-card">' +
-            '<div class="staff-avatar-placeholder">' + olInitials + '</div>' +
-            '<div class="staff-on-leave-info">' +
-              '<div class="flex justify-between items-center" style="gap: 8px;">' +
-                '<strong style="color: var(--color-primary-900); font-size: 0.95rem;">' + escapeHtml(ol.FullName) + '</strong>' +
-                '<span class="badge badge-active" style="font-size: 0.75rem;">' + escapeHtml(ol.LeaveType) + '</span>' +
-              '</div>' +
-              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
-                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
-                (ol.EmployeeId ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId)) : '') +
-              '</div>' +
-              '<div class="flex justify-between items-center text-xs" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--color-border);">' +
-                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
-                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
-              '</div>' +
+    // Staff Absences & Duty Roster (With Date Picker)
+    html += '<div class="card" id="manager-roster-card">' +
+      '<div class="card-header" style="display: flex; flex-direction: column; gap: 10px;">' +
+        '<div class="flex justify-between items-center flex-wrap gap-xs">' +
+          '<div>' +
+            '<div class="card-title" style="display: flex; align-items: center; gap: 6px;">' +
+              '<span>🏥 Hospital Staff Absences by Date</span>' +
             '</div>' +
-          '</div>';
-      }
-      html += '</div>';
-    }
-
-    html += '</div></div>';
+            '<div class="card-subtitle" id="manager-roster-subtitle">' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
+          '</div>' +
+          '<span id="manager-roster-badge" class="badge badge-teal" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' +
+            ((metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + (metrics.pendingOnLeaveToday ? metrics.pendingOnLeaveToday.length : 0)) + ' Total Absence(s)' +
+          '</span>' +
+        '</div>' +
+        '<div class="flex items-center gap-xs flex-wrap" style="background: var(--color-surface-hover); padding: 6px 10px; border-radius: var(--radius-md); border: 1px solid var(--color-border);">' +
+          '<label for="manager-roster-datepicker" class="text-xs text-muted" style="font-weight: 600; white-space: nowrap;">📅 Select Date:</label>' +
+          '<input type="date" id="manager-roster-datepicker" class="form-control" value="' + window.NRSLJ_CONFIG.getLocalDateString(0) + '" style="padding: 3px 8px; font-size: 0.85rem; height: 32px; max-width: 150px; font-weight: 600; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">' +
+          '<div class="flex gap-xs" style="margin-left: auto;">' +
+            '<button type="button" class="btn btn-outline btn-sm manager-roster-quick-btn" data-day="0" style="padding: 3px 10px; font-size: 0.78rem;">Today</button>' +
+            '<button type="button" class="btn btn-outline btn-sm manager-roster-quick-btn" data-day="1" style="padding: 3px 10px; font-size: 0.78rem;">Tomorrow</button>' +
+            '<button type="button" class="btn btn-outline btn-sm manager-roster-quick-btn" data-day="-1" style="padding: 3px 10px; font-size: 0.78rem;">Yesterday</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-body" id="manager-roster-body" style="padding: 20px;">' +
+        renderManagerRosterList(metrics.onLeaveToday || [], metrics.pendingOnLeaveToday || []) +
+      '</div></div>';
 
     container.innerHTML = html;
 
@@ -239,6 +214,176 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
         }
       });
     }
+
+    // Manager Absences Date Picker
+    var datePicker = document.getElementById('manager-roster-datepicker');
+    var rosterBody = document.getElementById('manager-roster-body');
+    var rosterSubtitle = document.getElementById('manager-roster-subtitle');
+    var rosterBadge = document.getElementById('manager-roster-badge');
+
+    function loadRosterForDate(dateStr) {
+      if (!dateStr || !rosterBody) return;
+      rosterBody.innerHTML = '<div class="text-center" style="padding: 30px;"><span class="spinner"></span><p class="text-xs text-muted mt-xs">Fetching staff roster for ' + dateStr + '...</p></div>';
+
+      var dateObj = new Date(dateStr + 'T00:00:00');
+      if (!isNaN(dateObj.getTime()) && rosterSubtitle) {
+        rosterSubtitle.textContent = 'Active absences &bull; ' + dateObj.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      }
+
+      window.NRSLJ_API.call('getStaffOnLeaveByDate', { date: dateStr })
+        .then(function(res) {
+          rosterBody.innerHTML = renderManagerRosterList(res.approvedLeaves || [], res.pendingLeaves || []);
+          var appCount = res.approvedCount || 0;
+          var pendCount = res.pendingCount || 0;
+          var total = appCount + pendCount;
+          if (rosterBadge) {
+            rosterBadge.textContent = total + ' Total Absence(s)' + (pendCount > 0 ? (' (' + pendCount + ' Pending)') : '');
+          }
+          attachRosterPendingReviewHandlers(container, res.pendingLeaves || []);
+        })
+        .catch(function(err) {
+          rosterBody.innerHTML = '<div class="alert alert-danger text-xs">' + escapeHtml(err.message) + '</div>';
+        });
+    }
+
+    if (datePicker) {
+      datePicker.addEventListener('change', function() {
+        loadRosterForDate(this.value);
+      });
+    }
+
+    var quickBtns = container.querySelectorAll('.manager-roster-quick-btn');
+    for (var q = 0; q < quickBtns.length; q++) {
+      quickBtns[q].addEventListener('click', function() {
+        var offset = parseInt(this.getAttribute('data-day'), 10) || 0;
+        var targetDate = window.NRSLJ_CONFIG.getLocalDateString(offset);
+        if (datePicker) datePicker.value = targetDate;
+        loadRosterForDate(targetDate);
+      });
+    }
+
+    attachRosterPendingReviewHandlers(container, metrics.pendingOnLeaveToday || []);
+  }
+
+  function attachRosterPendingReviewHandlers(container, pendingList) {
+    var btns = container.querySelectorAll('.review-roster-pending-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener('click', function() {
+        var reqId = this.getAttribute('data-id');
+        var found = null;
+        for (var p = 0; p < pendingList.length; p++) {
+          if (pendingList[p].RequestId === reqId || pendingList[p].RequestID === reqId) {
+            found = pendingList[p];
+            break;
+          }
+        }
+        if (found) {
+          // Normalize properties for modal
+          if (!found.RequestID) found.RequestID = found.RequestId;
+          openDecisionModal(found);
+        } else {
+          // Fallback: look in main pending list or open by id
+          var allPendingCards = container.querySelectorAll('.review-req-btn[data-id="' + reqId + '"]');
+          if (allPendingCards.length > 0) {
+            allPendingCards[0].click();
+          } else {
+            window.NRSLJ_TOAST.info('Viewing leave request #' + reqId);
+            openDecisionModal({ RequestID: reqId, FullName: 'Staff Member', EmployeeID: 'EMP', DepartmentName: 'Department', DesignationName: 'Role', LeaveTypeName: 'Leave', StartDate: '', EndDate: '', RequestedDays: 1, DayPart: 'FULL', Reason: 'Review pending' });
+          }
+        }
+      });
+    }
+  }
+
+  function renderManagerRosterList(approved, pending) {
+    approved = approved || [];
+    pending = pending || [];
+
+    if (approved.length === 0 && pending.length === 0) {
+      return '' +
+        '<div class="text-center text-muted" style="padding: 36px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
+          '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
+          '<div style="font-weight: 600; color: var(--color-text-main);">All Hospital Staff on Duty for this Date</div>' +
+          '<p class="text-sm text-muted" style="margin-top: 4px;">No approved absences or pending leave applications recorded for this date.</p>' +
+        '</div>';
+    }
+
+    var html = '';
+
+    // Approved leaves grid
+    if (approved.length > 0) {
+      html += '<div class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-teal-700); margin-bottom: 8px;">' +
+        'Approved Absences (' + approved.length + ')' +
+      '</div>';
+      html += '<div class="staff-on-leave-grid" style="margin-bottom: 16px;">';
+      for (var j = 0; j < approved.length; j++) {
+        var ol = approved[j];
+        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateRange = isSingleDay ? sDate : (sDate + ' to ' + eDate);
+
+        html += '' +
+          '<div class="staff-on-leave-card">' +
+            '<div class="staff-avatar-placeholder">' + olInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center" style="gap: 8px;">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.95rem;">' + escapeHtml(ol.FullName) + '</strong>' +
+                '<span class="badge badge-active" style="font-size: 0.75rem;">' + escapeHtml(ol.LeaveTypeName || ol.LeaveType) + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
+                (ol.EmployeeId || ol.EmployeeID ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId || ol.EmployeeID)) : '') +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--color-border);">' +
+                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
+                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+      html += '</div>';
+    }
+
+    // Pending requests section
+    if (pending.length > 0) {
+      html += '<div class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; margin-bottom: 8px;">' +
+        'Pending Leave Requests for this Date (' + pending.length + ')' +
+      '</div>';
+      html += '<div class="staff-on-leave-grid">';
+      for (var p = 0; p < pending.length; p++) {
+        var pl = pending[p];
+        var pInitials = (pl.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var psDate = window.NRSLJ_CONFIG.formatDate(pl.StartDate);
+        var peDate = window.NRSLJ_CONFIG.formatDate(pl.EndDate);
+        var pSingle = psDate === peDate;
+        var pRange = pSingle ? psDate : (psDate + ' to ' + peDate);
+
+        html += '' +
+          '<div class="staff-on-leave-card" style="border: 1px solid #fde68a; background: #fffbeb;">' +
+            '<div class="staff-avatar-placeholder" style="background: #f59e0b; color: #fff;">' + pInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center" style="gap: 8px;">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.95rem;">' + escapeHtml(pl.FullName) + '</strong>' +
+                '<span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.72rem; padding: 2px 8px; font-weight: 700;">' + (pl.Status === 'PENDING_HR' ? 'Pending HR' : 'Pending Manager') + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(pl.DepartmentName) + '</span>' +
+                (pl.EmployeeId || pl.EmployeeID ? (' &bull; ID: ' + escapeHtml(pl.EmployeeId || pl.EmployeeID)) : '') +
+                ' &bull; ' + escapeHtml(pl.LeaveTypeName || pl.LeaveType) +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #fcd34d;">' +
+                '<span style="color: #b45309; font-weight: 600;">' + pRange + ' (' + (pl.RequestedDays || 1) + 'd)</span>' +
+                '<button type="button" class="btn btn-outline btn-sm review-roster-pending-btn" data-id="' + (pl.RequestId || pl.RequestID) + '" style="padding: 2px 8px; font-size: 0.72rem; background: #fff;">Review & Decide</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+      html += '</div>';
+    }
+
+    return html;
   }
 
   function openDecisionModal(req) {

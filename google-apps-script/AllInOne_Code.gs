@@ -2351,11 +2351,16 @@ function getDashboardMetrics(sessionUser) {
   var allEmployees = readAllRows(CONFIG.SHEET_NAMES.EMPLOYEES);
   var allRequests = readAllRows(CONFIG.SHEET_NAMES.LEAVE_REQUESTS);
   var departments = readAllRows(CONFIG.SHEET_NAMES.DEPARTMENTS);
+  var designations = readAllRows(CONFIG.SHEET_NAMES.DESIGNATIONS);
   var leaveTypes = readAllRows(CONFIG.SHEET_NAMES.LEAVE_TYPES);
 
   var deptMap = {};
   for (var d = 0; d < departments.length; d++) {
     deptMap[departments[d].DepartmentID] = departments[d].DepartmentName;
+  }
+  var desigMap = {};
+  for (var dg = 0; dg < designations.length; dg++) {
+    desigMap[designations[dg].DesignationID] = designations[dg].DesignationName;
   }
   var typeMap = {};
   for (var t = 0; t < leaveTypes.length; t++) {
@@ -2388,6 +2393,7 @@ function getDashboardMetrics(sessionUser) {
   var todayObj = new Date(todayStr + 'T00:00:00');
 
   var onLeaveToday = [];
+  var pendingOnLeaveToday = [];
   var upcomingApproved = [];
   var approvedCount = 0;
   var rejectedCount = 0;
@@ -2403,17 +2409,22 @@ function getDashboardMetrics(sessionUser) {
 
       var emp = empMap[req.EmployeeID] || {};
       var deptName = deptMap[emp.DepartmentID] || 'General';
+      var desigName = desigMap[emp.DesignationID] || 'Staff';
 
       if (todayObj >= start && todayObj <= end) {
         onLeaveToday.push({
           RequestId: req.RequestID,
           EmployeeId: req.EmployeeID,
+          EmployeeID: req.EmployeeID,
           FullName: emp.FullName || 'Staff',
           DepartmentName: deptName,
+          DesignationName: desigName,
           LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+          LeaveTypeName: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
           StartDate: formatDateOnlyStr(req.StartDate),
           EndDate: formatDateOnlyStr(req.EndDate),
-          DayPart: req.DayPart
+          DayPart: req.DayPart,
+          Status: req.Status
         });
       } else if (start > todayObj) {
         // Next 14 days
@@ -2423,9 +2434,12 @@ function getDashboardMetrics(sessionUser) {
           upcomingApproved.push({
             RequestId: req.RequestID,
             EmployeeId: req.EmployeeID,
+            EmployeeID: req.EmployeeID,
             FullName: emp.FullName || 'Staff',
             DepartmentName: deptName,
+            DesignationName: desigName,
             LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+            LeaveTypeName: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
             StartDate: formatDateOnlyStr(req.StartDate),
             EndDate: formatDateOnlyStr(req.EndDate),
             RequestedDays: req.RequestedDays
@@ -2437,6 +2451,31 @@ function getDashboardMetrics(sessionUser) {
       deptCounts[deptName] = (deptCounts[deptName] || 0) + Number(req.RequestedDays || 0);
     } else if (req.Status === CONFIG.REQUEST_STATUS.REJECTED) {
       rejectedCount++;
+    } else if (req.Status === CONFIG.REQUEST_STATUS.PENDING_MANAGER || req.Status === CONFIG.REQUEST_STATUS.PENDING_HR) {
+      var start = parseDateOnly(req.StartDate);
+      var end = parseDateOnly(req.EndDate);
+      if (start && end && todayObj >= start && todayObj <= end) {
+        var emp = empMap[req.EmployeeID] || {};
+        var deptName = deptMap[emp.DepartmentID] || 'General';
+        var desigName = desigMap[emp.DesignationID] || 'Staff';
+        pendingOnLeaveToday.push({
+          RequestId: req.RequestID,
+          EmployeeId: req.EmployeeID,
+          EmployeeID: req.EmployeeID,
+          FullName: emp.FullName || 'Staff',
+          DepartmentName: deptName,
+          DesignationName: desigName,
+          LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+          LeaveTypeName: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+          StartDate: formatDateOnlyStr(req.StartDate),
+          EndDate: formatDateOnlyStr(req.EndDate),
+          DayPart: req.DayPart,
+          RequestedDays: req.RequestedDays,
+          Status: req.Status,
+          Reason: req.Reason || '',
+          CurrentApproverID: req.CurrentApproverID || ''
+        });
+      }
     }
   }
 
@@ -2448,6 +2487,8 @@ function getDashboardMetrics(sessionUser) {
     rejectedLeavesCount: rejectedCount,
     onLeaveTodayCount: onLeaveToday.length,
     onLeaveToday: onLeaveToday,
+    pendingOnLeaveTodayCount: pendingOnLeaveToday.length,
+    pendingOnLeaveToday: pendingOnLeaveToday,
     upcomingLeaves: upcomingApproved.slice(0, 10),
     departmentUtilization: deptCounts
   };
@@ -2620,6 +2661,98 @@ function exportReportCsv(sessionUser, reportType, filters) {
     filename: 'NRSLJ_' + reportType + '_' + Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyyMMdd_HHmmss') + '.csv',
     mimeType: 'text/csv',
     content: csvText
+  };
+}
+
+/**
+ * Retrieves staff on leave (both approved and pending) for any specified calendar date
+ */
+function getStaffOnLeaveByDate(sessionUser, targetDateStr) {
+  if (!sessionUser) throw new Error('Unauthorized');
+
+  var todayStr = Utilities.formatDate(new Date(), 'Asia/Kolkata', 'yyyy-MM-dd');
+  var queryDateStr = targetDateStr ? formatDateOnlyStr(targetDateStr) : todayStr;
+  var queryDateObj = parseDateOnly(queryDateStr);
+
+  if (!queryDateObj || isNaN(queryDateObj.getTime())) {
+    queryDateStr = todayStr;
+    queryDateObj = parseDateOnly(todayStr);
+  }
+
+  var allEmployees = readAllRows(CONFIG.SHEET_NAMES.EMPLOYEES);
+  var empMap = {};
+  for (var e = 0; e < allEmployees.length; e++) {
+    empMap[allEmployees[e].EmployeeID] = allEmployees[e];
+  }
+
+  var allDepts = readAllRows(CONFIG.SHEET_NAMES.DEPARTMENTS);
+  var deptMap = {};
+  for (var d = 0; d < allDepts.length; d++) {
+    deptMap[allDepts[d].DepartmentID] = allDepts[d].DepartmentName;
+  }
+
+  var allDesigs = readAllRows(CONFIG.SHEET_NAMES.DESIGNATIONS);
+  var desigMap = {};
+  for (var dg = 0; dg < allDesigs.length; dg++) {
+    desigMap[allDesigs[dg].DesignationID] = allDesigs[dg].DesignationName;
+  }
+
+  var allTypes = readAllRows(CONFIG.SHEET_NAMES.LEAVE_TYPES);
+  var typeMap = {};
+  for (var t = 0; t < allTypes.length; t++) {
+    typeMap[allTypes[t].LeaveTypeID] = allTypes[t].LeaveTypeName;
+  }
+
+  var allRequests = readAllRows(CONFIG.SHEET_NAMES.LEAVE_REQUESTS);
+  var approvedList = [];
+  var pendingList = [];
+
+  for (var i = 0; i < allRequests.length; i++) {
+    var req = allRequests[i];
+    var start = parseDateOnly(req.StartDate);
+    var end = parseDateOnly(req.EndDate);
+    if (!start || !end) continue;
+
+    if (queryDateObj >= start && queryDateObj <= end) {
+      var emp = empMap[req.EmployeeID] || {};
+      var deptName = deptMap[emp.DepartmentID] || emp.DepartmentID || 'General';
+      var desigName = desigMap[emp.DesignationID] || emp.DesignationID || 'Staff';
+
+      var item = {
+        RequestId: req.RequestID,
+        EmployeeId: req.EmployeeID,
+        EmployeeID: req.EmployeeID,
+        FullName: emp.FullName || 'Staff',
+        DepartmentName: deptName,
+        DesignationName: desigName,
+        LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+        LeaveTypeName: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
+        StartDate: formatDateOnlyStr(req.StartDate),
+        EndDate: formatDateOnlyStr(req.EndDate),
+        DayPart: req.DayPart,
+        RequestedDays: req.RequestedDays,
+        Reason: req.Reason || '',
+        Status: req.Status,
+        CurrentApproverID: req.CurrentApproverID || '',
+        EmergencyContact: emp.Phone || ''
+      };
+
+      if (req.Status === CONFIG.REQUEST_STATUS.APPROVED) {
+        approvedList.push(item);
+      } else if (req.Status === CONFIG.REQUEST_STATUS.PENDING_MANAGER || req.Status === CONFIG.REQUEST_STATUS.PENDING_HR) {
+        pendingList.push(item);
+      }
+    }
+  }
+
+  return {
+    queryDate: queryDateStr,
+    isToday: queryDateStr === todayStr,
+    approvedCount: approvedList.length,
+    approvedLeaves: approvedList,
+    pendingCount: pendingList.length,
+    pendingLeaves: pendingList,
+    totalCount: approvedList.length + pendingList.length
   };
 }
 
@@ -3555,6 +3688,11 @@ function handleApiAction(action, sessionToken, data) {
   if (action === 'getDashboardMetrics') {
     var metrics = getDashboardMetrics(sessionUser);
     return createSuccessResponse(metrics, 'Dashboard metrics retrieved');
+  }
+
+  if (action === 'getStaffOnLeaveByDate') {
+    var dateResult = getStaffOnLeaveByDate(sessionUser, data.date);
+    return createSuccessResponse(dateResult, 'Staff absences retrieved for date');
   }
 
   // ==========================================

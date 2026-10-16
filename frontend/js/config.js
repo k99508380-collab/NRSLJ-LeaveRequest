@@ -45,5 +45,16 @@ window.NRSLJ_CONFIG = {
       str = str.split(' ')[0];
     }
     return str;
+  },
+
+  getLocalDateString: function(offsetDays) {
+    var d = new Date();
+    if (offsetDays) {
+      d.setDate(d.getDate() + offsetDays);
+    }
+    var year = d.getFullYear();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    return year + '-' + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
   }
 };
