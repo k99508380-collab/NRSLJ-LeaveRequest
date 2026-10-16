@@ -5,7 +5,16 @@
  */
 
 window.NRSLJ_API = (function() {
-  var isGasEnvironment = typeof google !== 'undefined' && google.script && google.script.run;
+  function isGasEnvironment() {
+    if (typeof google !== 'undefined' && google && google.script && google.script.run) {
+      return true;
+    }
+    var host = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : '';
+    if (host.indexOf('googleusercontent.com') !== -1 || host.indexOf('script.google.com') !== -1) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Main dispatch method
@@ -13,7 +22,7 @@ window.NRSLJ_API = (function() {
   function call(action, data) {
     var sessionToken = localStorage.getItem(window.NRSLJ_CONFIG.STORAGE_KEYS.SESSION_TOKEN) || '';
 
-    if (isGasEnvironment) {
+    if (isGasEnvironment()) {
       return callGas(action, sessionToken, data);
     } else {
       return callHttp(action, sessionToken, data);
@@ -25,23 +34,37 @@ window.NRSLJ_API = (function() {
    */
   function callGas(action, sessionToken, data) {
     return new Promise(function(resolve, reject) {
-      try {
-        google.script.run
-          .withSuccessHandler(function(response) {
-            if (response && response.success) {
-              resolve(response.data);
-            } else {
-              var errMsg = response && response.message ? response.message : 'Operation failed';
-              reject(new Error(errMsg));
-            }
-          })
-          .withFailureHandler(function(err) {
-            reject(new Error(err && err.message ? err.message : 'Apps Script backend execution error'));
-          })
-          .apiDispatcher(action, sessionToken, data || {});
-      } catch (e) {
-        reject(e);
+      var retries = 0;
+      function execute() {
+        if (typeof google !== 'undefined' && google && google.script && google.script.run) {
+          try {
+            google.script.run
+              .withSuccessHandler(function(response) {
+                if (response && response.success) {
+                  resolve(response.data);
+                } else {
+                  var errMsg = response && response.message ? response.message : 'Operation failed';
+                  reject(new Error(errMsg));
+                }
+              })
+              .withFailureHandler(function(err) {
+                reject(new Error(err && err.message ? err.message : 'Apps Script backend execution error'));
+              })
+              .apiDispatcher(action, sessionToken, data || {});
+          } catch (e) {
+            reject(e);
+          }
+        } else {
+          retries++;
+          if (retries < 10) {
+            setTimeout(execute, 100);
+          } else {
+            // Fallback to HTTP if google.script.run is unavailable
+            callHttp(action, sessionToken, data).then(resolve).catch(reject);
+          }
+        }
       }
+      execute();
     });
   }
 
@@ -101,7 +124,7 @@ window.NRSLJ_API = (function() {
    */
   function ping(customUrl) {
     var targetUrl = customUrl || window.NRSLJ_CONFIG.getWebAppUrl();
-    if (isGasEnvironment) {
+    if (isGasEnvironment()) {
       return callGas('healthCheck', '', {});
     }
 
@@ -126,6 +149,6 @@ window.NRSLJ_API = (function() {
   return {
     call: call,
     ping: ping,
-    isGasEnvironment: function() { return isGasEnvironment; }
+    isGasEnvironment: isGasEnvironment
   };
 })();
