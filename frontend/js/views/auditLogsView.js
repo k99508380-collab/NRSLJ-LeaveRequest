@@ -89,14 +89,14 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
           (l.SanitizedDetails || '').toLowerCase().indexOf(q) !== -1;
       });
       tbody.innerHTML = renderRows(filtered);
-      attachDetailEvents();
+      attachDetailEvents(filtered);
     });
 
     document.getElementById('btn-refresh-audit').addEventListener('click', function() {
       window.NRSLJ_AUDIT_LOGS_VIEW.render('main-content');
     });
 
-    attachDetailEvents();
+    attachDetailEvents(logs);
   }
 
   function renderRows(list) {
@@ -120,18 +120,27 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
             '<span class="badge ' + (isSuccess ? 'badge-approved' : 'badge-rejected') + '">' + escapeHtml(l.Result) + '</span>' +
           '</td>' +
           '<td data-label="Details">' +
-            '<button type="button" class="btn btn-outline btn-sm action-view-audit-detail" data-json="' + escapeHtml(l.SanitizedDetails || '{}') + '">Inspect</button>' +
+            '<button type="button" class="btn btn-outline btn-sm action-view-audit-detail" data-id="' + escapeHtml(l.AuditID) + '">Inspect</button>' +
           '</td>' +
         '</tr>';
     }
     return html;
   }
 
-  function attachDetailEvents() {
+  function attachDetailEvents(list) {
+    var currentLogs = list || [];
     var btns = document.querySelectorAll('.action-view-audit-detail');
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function() {
-        var rawJson = this.getAttribute('data-json');
+        var auditId = this.getAttribute('data-id');
+        var l = null;
+        for (var j = 0; j < currentLogs.length; j++) {
+          if (currentLogs[j].AuditID === auditId) {
+            l = currentLogs[j];
+            break;
+          }
+        }
+        var rawJson = l ? (l.SanitizedDetails || '{}') : '{}';
         var pretty = rawJson;
         try {
           pretty = JSON.stringify(JSON.parse(rawJson), null, 2);
@@ -149,9 +158,13 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {

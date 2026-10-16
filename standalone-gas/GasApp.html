@@ -1883,9 +1883,13 @@ window.NRSLJ_TOAST = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -2137,9 +2141,13 @@ window.NRSLJ_HEADER = (function() {
   }
 
   function escapeHtml(str) {
-    var d = document.createElement('div');
-    d.innerText = str || '';
-    return d.innerHTML;
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -2563,9 +2571,13 @@ window.NRSLJ_AUTH_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -2805,9 +2817,13 @@ window.NRSLJ_EMPLOYEE_DASHBOARD = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -3150,9 +3166,13 @@ window.NRSLJ_LEAVE_APPLY_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -3412,9 +3432,13 @@ window.NRSLJ_LEAVE_HISTORY_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -3575,7 +3599,7 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
 
             '<div class="flex justify-between items-center" style="padding-top: 12px; border-top: 1px solid var(--color-border); flex-wrap: wrap; gap: 10px;">' +
               '<div class="text-xs text-muted">Request Ref: <code style="font-weight: 600; color: var(--color-primary-900);">' + escapeHtml(req.RequestID) + '</code></div>' +
-              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '" style="padding: 8px 20px; font-weight: 600;">' +
+              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-id="' + escapeHtml(req.RequestID) + '" style="padding: 8px 20px; font-weight: 600;">' +
                 '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                 '<span>Review & Decide</span>' +
               '</button>' +
@@ -3644,8 +3668,19 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
     var reviewBtns = container.querySelectorAll('.review-req-btn');
     for (var k = 0; k < reviewBtns.length; k++) {
       reviewBtns[k].addEventListener('click', function() {
-        var reqData = JSON.parse(this.getAttribute('data-json'));
-        openDecisionModal(reqData);
+        var reqId = this.getAttribute('data-id');
+        var reqData = null;
+        for (var r = 0; r < pending.length; r++) {
+          if (pending[r].RequestID === reqId) {
+            reqData = pending[r];
+            break;
+          }
+        }
+        if (reqData) {
+          openDecisionModal(reqData);
+        } else {
+          window.NRSLJ_TOAST.error('Leave request record not found for ' + reqId);
+        }
       });
     }
   }
@@ -3733,9 +3768,13 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -3984,9 +4023,13 @@ window.NRSLJ_ADMIN_DASHBOARD = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -4100,8 +4143,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
             '<td data-label="Submitted At">' + (pr.CreatedAt ? pr.CreatedAt.substring(0, 10) : '') + '</td>' +
             '<td data-label="Actions">' +
               '<div class="flex gap-xs justify-end">' +
-                '<button type="button" class="btn btn-primary btn-sm action-approve-reg" data-json="' + escapeHtml(JSON.stringify(pr)) + '">Approve & Assign</button>' +
-                '<button type="button" class="btn btn-danger btn-sm action-reject-reg" data-id="' + pr.EmployeeID + '">Reject</button>' +
+                '<button type="button" class="btn btn-primary btn-sm action-approve-reg" data-id="' + escapeHtml(pr.EmployeeID) + '">Approve & Assign</button>' +
+                '<button type="button" class="btn btn-danger btn-sm action-reject-reg" data-id="' + escapeHtml(pr.EmployeeID) + '">Reject</button>' +
               '</div>' +
             '</td>' +
           '</tr>';
@@ -4219,7 +4262,7 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
       });
 
       empTbody.innerHTML = renderEmpRows(filtered, deptMap, desigMap);
-      attachEmpActions(depts, desigs, managers);
+      attachEmpActions(filtered, depts, desigs, managers);
     }
 
     searchInput.addEventListener('input', filterEmployees);
@@ -4227,8 +4270,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     roleFilter.addEventListener('change', filterEmployees);
     statusFilter.addEventListener('change', filterEmployees);
 
-    attachPendingActions(depts, desigs, managers);
-    attachEmpActions(depts, desigs, managers);
+    attachPendingActions(pendingRegs, depts, desigs, managers);
+    attachEmpActions(allEmps, depts, desigs, managers);
   }
 
   function renderEmpRows(list, deptMap, desigMap) {
@@ -4256,8 +4299,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
           '</td>' +
           '<td data-label="Actions">' +
             '<div class="flex gap-xs justify-end">' +
-              '<button type="button" class="btn btn-outline btn-sm action-edit-emp" data-json="' + escapeHtml(JSON.stringify(e)) + '">Edit</button>' +
-              '<button type="button" class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + ' btn-sm action-toggle-status" data-id="' + e.EmployeeID + '" data-status="' + e.AccountStatus + '">' +
+              '<button type="button" class="btn btn-outline btn-sm action-edit-emp" data-id="' + escapeHtml(e.EmployeeID) + '">Edit</button>' +
+              '<button type="button" class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + ' btn-sm action-toggle-status" data-id="' + escapeHtml(e.EmployeeID) + '" data-status="' + e.AccountStatus + '">' +
                 (isActive ? 'Deactivate' : 'Activate') +
               '</button>' +
             '</div>' +
@@ -4267,13 +4310,24 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     return html;
   }
 
-  function attachPendingActions(depts, desigs, managers) {
+  function attachPendingActions(pendingList, depts, desigs, managers) {
     // Approve Registration buttons
     var approveBtns = document.querySelectorAll('.action-approve-reg');
     for (var i = 0; i < approveBtns.length; i++) {
       approveBtns[i].addEventListener('click', function() {
-        var pr = JSON.parse(this.getAttribute('data-json'));
-        openApprovalModal(pr, depts, desigs, managers);
+        var empId = this.getAttribute('data-id');
+        var pr = null;
+        for (var p = 0; p < pendingList.length; p++) {
+          if (pendingList[p].EmployeeID === empId) {
+            pr = pendingList[p];
+            break;
+          }
+        }
+        if (pr) {
+          openApprovalModal(pr, depts, desigs, managers);
+        } else {
+          window.NRSLJ_TOAST.error('Registration record not found for ' + empId);
+        }
       });
     }
 
@@ -4409,13 +4463,24 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     });
   }
 
-  function attachEmpActions(depts, desigs, managers) {
+  function attachEmpActions(empList, depts, desigs, managers) {
     // Edit Employee buttons
     var editBtns = document.querySelectorAll('.action-edit-emp');
     for (var i = 0; i < editBtns.length; i++) {
       editBtns[i].addEventListener('click', function() {
-        var emp = JSON.parse(this.getAttribute('data-json'));
-        openEditEmployeeModal(emp, depts, desigs, managers);
+        var empId = this.getAttribute('data-id');
+        var emp = null;
+        for (var eIdx = 0; eIdx < empList.length; eIdx++) {
+          if (empList[eIdx].EmployeeID === empId) {
+            emp = empList[eIdx];
+            break;
+          }
+        }
+        if (emp) {
+          openEditEmployeeModal(emp, depts, desigs, managers);
+        } else {
+          window.NRSLJ_TOAST.error('Employee record not found for ' + empId);
+        }
       });
     }
 
@@ -4532,9 +4597,13 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -5036,9 +5105,13 @@ window.NRSLJ_ADMIN_LEAVE_CONFIG_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -5260,9 +5333,13 @@ window.NRSLJ_ADMIN_REPORTS_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -5511,9 +5588,13 @@ window.NRSLJ_HOSPITAL_SETTINGS_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -5612,14 +5693,14 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
           (l.SanitizedDetails || '').toLowerCase().indexOf(q) !== -1;
       });
       tbody.innerHTML = renderRows(filtered);
-      attachDetailEvents();
+      attachDetailEvents(filtered);
     });
 
     document.getElementById('btn-refresh-audit').addEventListener('click', function() {
       window.NRSLJ_AUDIT_LOGS_VIEW.render('main-content');
     });
 
-    attachDetailEvents();
+    attachDetailEvents(logs);
   }
 
   function renderRows(list) {
@@ -5643,18 +5724,27 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
             '<span class="badge ' + (isSuccess ? 'badge-approved' : 'badge-rejected') + '">' + escapeHtml(l.Result) + '</span>' +
           '</td>' +
           '<td data-label="Details">' +
-            '<button type="button" class="btn btn-outline btn-sm action-view-audit-detail" data-json="' + escapeHtml(l.SanitizedDetails || '{}') + '">Inspect</button>' +
+            '<button type="button" class="btn btn-outline btn-sm action-view-audit-detail" data-id="' + escapeHtml(l.AuditID) + '">Inspect</button>' +
           '</td>' +
         '</tr>';
     }
     return html;
   }
 
-  function attachDetailEvents() {
+  function attachDetailEvents(list) {
+    var currentLogs = list || [];
     var btns = document.querySelectorAll('.action-view-audit-detail');
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function() {
-        var rawJson = this.getAttribute('data-json');
+        var auditId = this.getAttribute('data-id');
+        var l = null;
+        for (var j = 0; j < currentLogs.length; j++) {
+          if (currentLogs[j].AuditID === auditId) {
+            l = currentLogs[j];
+            break;
+          }
+        }
+        var rawJson = l ? (l.SanitizedDetails || '{}') : '{}';
         var pretty = rawJson;
         try {
           pretty = JSON.stringify(JSON.parse(rawJson), null, 2);
@@ -5672,9 +5762,13 @@ window.NRSLJ_AUDIT_LOGS_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
@@ -5994,9 +6088,13 @@ window.NRSLJ_DIAGNOSTICS_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {

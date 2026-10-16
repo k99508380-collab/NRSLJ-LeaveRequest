@@ -104,8 +104,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
             '<td data-label="Submitted At">' + (pr.CreatedAt ? pr.CreatedAt.substring(0, 10) : '') + '</td>' +
             '<td data-label="Actions">' +
               '<div class="flex gap-xs justify-end">' +
-                '<button type="button" class="btn btn-primary btn-sm action-approve-reg" data-json="' + escapeHtml(JSON.stringify(pr)) + '">Approve & Assign</button>' +
-                '<button type="button" class="btn btn-danger btn-sm action-reject-reg" data-id="' + pr.EmployeeID + '">Reject</button>' +
+                '<button type="button" class="btn btn-primary btn-sm action-approve-reg" data-id="' + escapeHtml(pr.EmployeeID) + '">Approve & Assign</button>' +
+                '<button type="button" class="btn btn-danger btn-sm action-reject-reg" data-id="' + escapeHtml(pr.EmployeeID) + '">Reject</button>' +
               '</div>' +
             '</td>' +
           '</tr>';
@@ -223,7 +223,7 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
       });
 
       empTbody.innerHTML = renderEmpRows(filtered, deptMap, desigMap);
-      attachEmpActions(depts, desigs, managers);
+      attachEmpActions(filtered, depts, desigs, managers);
     }
 
     searchInput.addEventListener('input', filterEmployees);
@@ -231,8 +231,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     roleFilter.addEventListener('change', filterEmployees);
     statusFilter.addEventListener('change', filterEmployees);
 
-    attachPendingActions(depts, desigs, managers);
-    attachEmpActions(depts, desigs, managers);
+    attachPendingActions(pendingRegs, depts, desigs, managers);
+    attachEmpActions(allEmps, depts, desigs, managers);
   }
 
   function renderEmpRows(list, deptMap, desigMap) {
@@ -260,8 +260,8 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
           '</td>' +
           '<td data-label="Actions">' +
             '<div class="flex gap-xs justify-end">' +
-              '<button type="button" class="btn btn-outline btn-sm action-edit-emp" data-json="' + escapeHtml(JSON.stringify(e)) + '">Edit</button>' +
-              '<button type="button" class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + ' btn-sm action-toggle-status" data-id="' + e.EmployeeID + '" data-status="' + e.AccountStatus + '">' +
+              '<button type="button" class="btn btn-outline btn-sm action-edit-emp" data-id="' + escapeHtml(e.EmployeeID) + '">Edit</button>' +
+              '<button type="button" class="btn ' + (isActive ? 'btn-danger' : 'btn-success') + ' btn-sm action-toggle-status" data-id="' + escapeHtml(e.EmployeeID) + '" data-status="' + e.AccountStatus + '">' +
                 (isActive ? 'Deactivate' : 'Activate') +
               '</button>' +
             '</div>' +
@@ -271,13 +271,24 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     return html;
   }
 
-  function attachPendingActions(depts, desigs, managers) {
+  function attachPendingActions(pendingList, depts, desigs, managers) {
     // Approve Registration buttons
     var approveBtns = document.querySelectorAll('.action-approve-reg');
     for (var i = 0; i < approveBtns.length; i++) {
       approveBtns[i].addEventListener('click', function() {
-        var pr = JSON.parse(this.getAttribute('data-json'));
-        openApprovalModal(pr, depts, desigs, managers);
+        var empId = this.getAttribute('data-id');
+        var pr = null;
+        for (var p = 0; p < pendingList.length; p++) {
+          if (pendingList[p].EmployeeID === empId) {
+            pr = pendingList[p];
+            break;
+          }
+        }
+        if (pr) {
+          openApprovalModal(pr, depts, desigs, managers);
+        } else {
+          window.NRSLJ_TOAST.error('Registration record not found for ' + empId);
+        }
       });
     }
 
@@ -413,13 +424,24 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
     });
   }
 
-  function attachEmpActions(depts, desigs, managers) {
+  function attachEmpActions(empList, depts, desigs, managers) {
     // Edit Employee buttons
     var editBtns = document.querySelectorAll('.action-edit-emp');
     for (var i = 0; i < editBtns.length; i++) {
       editBtns[i].addEventListener('click', function() {
-        var emp = JSON.parse(this.getAttribute('data-json'));
-        openEditEmployeeModal(emp, depts, desigs, managers);
+        var empId = this.getAttribute('data-id');
+        var emp = null;
+        for (var eIdx = 0; eIdx < empList.length; eIdx++) {
+          if (empList[eIdx].EmployeeID === empId) {
+            emp = empList[eIdx];
+            break;
+          }
+        }
+        if (emp) {
+          openEditEmployeeModal(emp, depts, desigs, managers);
+        } else {
+          window.NRSLJ_TOAST.error('Employee record not found for ' + empId);
+        }
       });
     }
 
@@ -536,9 +558,13 @@ window.NRSLJ_ADMIN_EMPLOYEES_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {

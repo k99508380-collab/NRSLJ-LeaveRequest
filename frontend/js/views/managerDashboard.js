@@ -151,7 +151,7 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
 
             '<div class="flex justify-between items-center" style="padding-top: 12px; border-top: 1px solid var(--color-border); flex-wrap: wrap; gap: 10px;">' +
               '<div class="text-xs text-muted">Request Ref: <code style="font-weight: 600; color: var(--color-primary-900);">' + escapeHtml(req.RequestID) + '</code></div>' +
-              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '" style="padding: 8px 20px; font-weight: 600;">' +
+              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-id="' + escapeHtml(req.RequestID) + '" style="padding: 8px 20px; font-weight: 600;">' +
                 '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                 '<span>Review & Decide</span>' +
               '</button>' +
@@ -220,8 +220,19 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
     var reviewBtns = container.querySelectorAll('.review-req-btn');
     for (var k = 0; k < reviewBtns.length; k++) {
       reviewBtns[k].addEventListener('click', function() {
-        var reqData = JSON.parse(this.getAttribute('data-json'));
-        openDecisionModal(reqData);
+        var reqId = this.getAttribute('data-id');
+        var reqData = null;
+        for (var r = 0; r < pending.length; r++) {
+          if (pending[r].RequestID === reqId) {
+            reqData = pending[r];
+            break;
+          }
+        }
+        if (reqData) {
+          openDecisionModal(reqData);
+        } else {
+          window.NRSLJ_TOAST.error('Leave request record not found for ' + reqId);
+        }
       });
     }
   }
@@ -309,9 +320,13 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {

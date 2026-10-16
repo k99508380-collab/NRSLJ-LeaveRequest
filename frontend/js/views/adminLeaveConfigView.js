@@ -492,9 +492,13 @@ window.NRSLJ_ADMIN_LEAVE_CONFIG_VIEW = (function() {
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
-    div.innerText = text || '';
-    return div.innerHTML;
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {

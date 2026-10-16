@@ -152,9 +152,13 @@ window.NRSLJ_HEADER = (function() {
   }
 
   function escapeHtml(str) {
-    var d = document.createElement('div');
-    d.innerText = str || '';
-    return d.innerHTML;
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return {
