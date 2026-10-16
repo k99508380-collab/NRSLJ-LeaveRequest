@@ -15,13 +15,16 @@ window.NRSLJ_CONFIG = {
     HOSPITAL_LOGO: 'nrslj_custom_logo'
   },
 
+  // Default Web App URL
+  DEFAULT_WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbw2oV0ujrIqHwPOEn_7ZQ9loq9IlDugYdGrJoKtB6Epru5-q46cozBaLIuYxHVVDPU2tQ/exec',
+
   // Default Web App URL (Can be updated via UI Diagnostics screen or environment)
   getWebAppUrl: function() {
     var stored = localStorage.getItem(this.STORAGE_KEYS.WEB_APP_URL);
     if (stored && stored.trim().length > 0) {
       return stored.trim();
     }
-    return ''; // Set during deployment or configured in Diagnostics modal
+    return this.DEFAULT_WEB_APP_URL;
   },
 
   setWebAppUrl: function(url) {
