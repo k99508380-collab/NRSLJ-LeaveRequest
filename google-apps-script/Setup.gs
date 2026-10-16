@@ -357,3 +357,11 @@ function createFirstAdmin(username, fullName, phone, password) {
 
   return safeProfile;
 }
+
+/**
+ * One-click runner for first admin initialization
+ * You can select this function in the Apps Script dropdown and click Run!
+ */
+function runFirstAdminSetup() {
+  return createFirstAdmin('admin', 'Hospital Administrator', '9876543210', 'MasterAdminPass@2026');
+}
