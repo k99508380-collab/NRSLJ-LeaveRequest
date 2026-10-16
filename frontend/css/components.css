@@ -137,6 +137,8 @@
   flex-direction: column;
   flex-shrink: 0;
   height: calc(100vh - var(--header-height));
+  position: sticky;
+  top: var(--header-height);
   border-right: 1px solid var(--color-primary-800);
   transition: transform var(--transition-normal);
   z-index: 30;
@@ -818,3 +820,206 @@
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* ==========================================================================
+   11. Expanded Policy, Request & Staff Attendance Components
+   ========================================================================== */
+.policy-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.policy-expanded-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-top: 4px solid var(--color-teal-600);
+}
+
+.policy-expanded-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.policy-expanded-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-surface-hover) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.policy-expanded-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.policy-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.policy-metric-box {
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.policy-metric-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.policy-metric-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary-900);
+  line-height: 1.2;
+}
+
+.policy-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.policy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.policy-chip-teal {
+  background-color: var(--color-teal-50);
+  border-color: var(--color-teal-100);
+  color: var(--color-teal-700);
+}
+
+/* Expanded Pending Request Cards */
+.pending-requests-deck {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.pending-request-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all var(--transition-fast);
+}
+
+.pending-request-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-teal-500);
+}
+
+.pending-request-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pending-request-mid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 820px) {
+  .pending-request-mid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pending-reason-box {
+  background: var(--color-surface-hover);
+  border-left: 4px solid var(--color-teal-600);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  line-height: 1.5;
+}
+
+/* Expanded Staff On Leave Cards */
+.staff-on-leave-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.staff-on-leave-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.staff-on-leave-card:hover {
+  border-color: var(--color-teal-500);
+  box-shadow: var(--shadow-md);
+}
+
+.staff-avatar-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-teal-100);
+  color: var(--color-teal-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.staff-on-leave-info {
+  flex: 1;
+  min-width: 0;
+}
+
+

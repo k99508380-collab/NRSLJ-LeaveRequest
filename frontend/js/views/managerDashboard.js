@@ -84,105 +84,135 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
         '</div>' +
       '</div>' +
 
-      // Pending Approvals Table Card
+      // Pending Approvals Section (Expanded Cards)
       '<div class="card mb-lg">' +
         '<div class="card-header">' +
           '<div>' +
             '<div class="card-title">Pending Leave Requests</div>' +
-            '<div class="card-subtitle">Requests requiring your review and recommendation</div>' +
+            '<div class="card-subtitle">Requests requiring your review and recommendation &bull; Full details and reasons</div>' +
           '</div>' +
+          '<span class="badge badge-pending" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' + pending.length + ' Pending</span>' +
         '</div>' +
-        '<div class="table-responsive">' +
-          '<table class="data-table table-responsive-cards">' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Employee</th>' +
-                '<th>Department / Role</th>' +
-                '<th>Leave Type</th>' +
-                '<th>Dates & Duration</th>' +
-                '<th>Reason</th>' +
-                '<th>Submitted</th>' +
-                '<th>Review Action</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody>';
+        '<div class="card-body" style="padding: 20px;">';
 
     if (pending.length === 0) {
-      html += '<tr><td colspan="7" class="text-center text-muted" style="padding: 40px;">No pending leave requests awaiting your action. Good job!</td></tr>';
+      html += '' +
+        '<div class="text-center text-muted" style="padding: 40px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
+          '<div style="font-size: 2rem; margin-bottom: 8px;">🎉</div>' +
+          '<div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main);">No Pending Leave Requests</div>' +
+          '<p class="text-sm text-muted" style="margin-top: 4px;">All employee leave applications assigned to you have been reviewed.</p>' +
+        '</div>';
     } else {
+      html += '<div class="pending-requests-deck">';
       for (var i = 0; i < pending.length; i++) {
         var req = pending[i];
+        var initials = (req.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = req.StartDate === req.EndDate;
+        var dateDisplay = isSingleDay ? req.StartDate : (req.StartDate + ' &rarr; ' + req.EndDate);
+
         html += '' +
-          '<tr>' +
-            '<td data-label="Employee">' +
-              '<strong>' + escapeHtml(req.FullName) + '</strong><br>' +
-              '<span class="text-xs text-muted">ID: ' + escapeHtml(req.EmployeeID) + '</span>' +
-            '</td>' +
-            '<td data-label="Department / Role">' +
-              '<span>' + escapeHtml(req.DepartmentName) + '</span><br>' +
-              '<span class="text-xs text-muted">' + escapeHtml(req.DesignationName) + '</span>' +
-            '</td>' +
-            '<td data-label="Leave Type">' +
-              '<span class="badge badge-active">' + escapeHtml(req.LeaveTypeName) + '</span>' +
-            '</td>' +
-            '<td data-label="Dates & Duration">' +
-              '<span>' + req.StartDate + (req.StartDate !== req.EndDate ? ' to ' + req.EndDate : '') + '</span><br>' +
-              '<strong class="text-xs" style="color: var(--color-teal-700);">' + req.RequestedDays + ' day(s) (' + req.DayPart + ')</strong>' +
-            '</td>' +
-            '<td data-label="Reason" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="' + escapeHtml(req.Reason) + '">' +
-              escapeHtml(req.Reason) +
-            '</td>' +
-            '<td data-label="Submitted">' + (req.SubmittedAt ? req.SubmittedAt.substring(0, 10) : '') + '</td>' +
-            '<td data-label="Review Action">' +
-              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '">' +
+          '<div class="pending-request-card">' +
+            '<div class="pending-request-top">' +
+              '<div class="flex items-center gap-md">' +
+                '<div class="staff-avatar-placeholder">' + initials + '</div>' +
+                '<div>' +
+                  '<div style="font-weight: 700; font-size: 1.05rem; color: var(--color-primary-900);">' + escapeHtml(req.FullName) + '</div>' +
+                  '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                    '<span class="badge" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); margin-right: 6px; font-weight: 600;">ID: ' + escapeHtml(req.EmployeeID) + '</span>' +
+                    '<span>' + escapeHtml(req.DepartmentName) + ' &bull; ' + escapeHtml(req.DesignationName) + '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-sm">' +
+                '<span class="badge badge-active" style="font-size: 0.85rem; padding: 5px 12px; font-weight: 600;">' + escapeHtml(req.LeaveTypeName) + '</span>' +
+                '<span class="text-xs text-muted">Submitted ' + (req.SubmittedAt ? req.SubmittedAt.substring(0, 10) : '') + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="pending-request-mid">' +
+              '<div style="display: flex; flex-direction: column; gap: 8px;">' +
+                '<div style="background: var(--color-surface-hover); border-radius: var(--radius-md); padding: 12px 14px; border: 1px solid var(--color-border);">' +
+                  '<div class="text-xs text-muted" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Requested Dates</div>' +
+                  '<div style="font-weight: 700; font-size: 1rem; color: var(--color-primary-900); margin-top: 4px;">' + dateDisplay + '</div>' +
+                  '<div style="margin-top: 6px;">' +
+                    '<span class="badge badge-teal" style="font-size: 0.8rem; font-weight: 700;">' + req.RequestedDays + ' Day(s) (' + req.DayPart + ')</span>' +
+                  '</div>' +
+                '</div>' +
+                (req.EmergencyContact ? ('<div class="text-xs text-muted"><strong>Emergency Contact:</strong> ' + escapeHtml(req.EmergencyContact) + '</div>') : '') +
+              '</div>' +
+
+              '<div>' +
+                '<div class="text-xs text-muted" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Reason for Leave Request:</div>' +
+                '<div class="pending-reason-box">' +
+                  escapeHtml(req.Reason || 'No reason provided.') +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="flex justify-between items-center" style="padding-top: 12px; border-top: 1px solid var(--color-border); flex-wrap: wrap; gap: 10px;">' +
+              '<div class="text-xs text-muted">Request Ref: <code style="font-weight: 600; color: var(--color-primary-900);">' + escapeHtml(req.RequestID) + '</code></div>' +
+              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '" style="padding: 8px 20px; font-weight: 600;">' +
+                '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                 '<span>Review & Decide</span>' +
               '</button>' +
-            '</td>' +
-          '</tr>';
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>';
+    html += '</div></div>';
 
-    // Staff On Leave Today Section
+    // Staff On Leave Today Section (Expanded Cards)
     html += '<div class="card">' +
       '<div class="card-header">' +
         '<div>' +
           '<div class="card-title">Hospital Staff on Leave Today</div>' +
-          '<div class="card-subtitle">Active absences across departments for duty roster planning</div>' +
+          '<div class="card-subtitle">Active absences across departments for duty roster planning &bull; ' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
         '</div>' +
+        '<span class="badge badge-teal" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' + (metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + ' On Leave</span>' +
       '</div>' +
-      '<div class="table-responsive">' +
-        '<table class="data-table table-responsive-cards">' +
-          '<thead>' +
-            '<tr>' +
-              '<th>Employee</th>' +
-              '<th>Department</th>' +
-              '<th>Leave Type</th>' +
-              '<th>Duration</th>' +
-              '<th>Day Part</th>' +
-            '</tr>' +
-          '</thead>' +
-          '<tbody>';
+      '<div class="card-body" style="padding: 20px;">';
 
     var onLeave = metrics.onLeaveToday || [];
     if (onLeave.length === 0) {
-      html += '<tr><td colspan="5" class="text-center text-muted" style="padding: 24px;">No hospital staff on approved leave today.</td></tr>';
+      html += '' +
+        '<div class="text-center text-muted" style="padding: 36px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
+          '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
+          '<div style="font-weight: 600; color: var(--color-text-main);">All Hospital Staff on Duty Today</div>' +
+          '<p class="text-sm text-muted" style="margin-top: 4px;">No approved leaves recorded for today. Full staffing across all hospital departments.</p>' +
+        '</div>';
     } else {
+      html += '<div class="staff-on-leave-grid">';
       for (var j = 0; j < onLeave.length; j++) {
         var ol = onLeave[j];
+        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = ol.StartDate === ol.EndDate;
+        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' to ' + ol.EndDate);
+
         html += '' +
-          '<tr>' +
-            '<td data-label="Employee"><strong>' + escapeHtml(ol.FullName) + '</strong> (' + escapeHtml(ol.EmployeeId) + ')</td>' +
-            '<td data-label="Department">' + escapeHtml(ol.DepartmentName) + '</td>' +
-            '<td data-label="Leave Type"><span class="badge badge-active">' + escapeHtml(ol.LeaveType) + '</span></td>' +
-            '<td data-label="Duration">' + ol.StartDate + ' to ' + ol.EndDate + '</td>' +
-            '<td data-label="Day Part">' + ol.DayPart + '</td>' +
-          '</tr>';
+          '<div class="staff-on-leave-card">' +
+            '<div class="staff-avatar-placeholder">' + olInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center" style="gap: 8px;">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.95rem;">' + escapeHtml(ol.FullName) + '</strong>' +
+                '<span class="badge badge-active" style="font-size: 0.75rem;">' + escapeHtml(ol.LeaveType) + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
+                (ol.EmployeeId ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId)) : '') +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--color-border);">' +
+                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
+                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>';
+    html += '</div></div>';
 
     container.innerHTML = html;
 

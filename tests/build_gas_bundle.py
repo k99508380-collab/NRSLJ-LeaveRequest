@@ -88,4 +88,9 @@ bundle_html = f"""<!DOCTYPE html>
 with open(OUTPUT_FILE, 'w', encoding='utf-8') as out:
     out.write(bundle_html)
 
-print(f"Successfully generated {OUTPUT_FILE} ({len(bundle_html):,} bytes)")
+gas_dest = os.path.join(BASE_DIR, 'google-apps-script', 'GasApp.html')
+with open(gas_dest, 'w', encoding='utf-8') as out:
+    out.write(bundle_html)
+
+print(f"Successfully generated {OUTPUT_FILE} and {gas_dest} ({len(bundle_html):,} bytes)")
+

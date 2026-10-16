@@ -62,56 +62,92 @@ window.NRSLJ_ADMIN_LEAVE_CONFIG_VIEW = (function() {
         '</div>' +
       '</div>' +
 
-      // 1. Leave Categories & Policy Table
-      '<div class="card mb-lg">' +
-        '<div class="card-header">' +
+      // 1. Leave Categories & Policy Section - Expanded Clear View
+      '<div class="mb-xl">' +
+        '<div class="flex justify-between items-center mb-md flex-wrap gap-sm">' +
           '<div>' +
-            '<div class="card-title">Configured Leave Types & Rules</div>' +
-            '<div class="card-subtitle">Annual allowances, notice requirements & weekend/holiday counting rules</div>' +
+            '<h2 style="color: var(--color-primary-900); font-size: 1.25rem;">Configured Leave Types & Rules</h2>' +
+            '<p class="text-sm text-muted">Annual allowances, notice requirements &amp; weekend/holiday counting rules for all hospital units</p>' +
           '</div>' +
         '</div>' +
-        '<div class="table-responsive">' +
-          '<table class="data-table table-responsive-cards">' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Category Name</th>' +
-                '<th>Annual Quota</th>' +
-                '<th>Max Duration</th>' +
-                '<th>Notice Days</th>' +
-                '<th>Weekends Policy</th>' +
-                '<th>Balance Required</th>' +
-                '<th>Status</th>' +
-                '<th>Actions</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody>';
+
+        // Expanded Policy Cards Grid
+        '<div class="policy-card-grid mb-lg">';
 
     for (var i = 0; i < types.length; i++) {
       var t = types[i];
       var pol = policyMap[t.LeaveTypeID] || {};
       var isActive = t.IsActive === true || t.IsActive === 'TRUE' || t.IsActive === 'true';
+      var weekendText = pol.WeekendsPolicy === 'EXCLUDE_SUNDAYS' ? 'Sundays Excluded' : (pol.WeekendsPolicy === 'EXCLUDE_WEEKENDS' ? 'Sat & Sun Excluded' : 'All Days Counted');
+      var holidayText = pol.HolidaysPolicy === 'EXCLUDE_HOLIDAYS' ? 'Hospital Holidays Excluded' : 'Holidays Counted';
 
       html += '' +
-        '<tr>' +
-          '<td data-label="Category Name">' +
-            '<strong>' + escapeHtml(t.LeaveTypeName) + '</strong><br>' +
-            '<span class="text-xs text-muted">' + escapeHtml(t.Description || 'No description') + '</span>' +
-          '</td>' +
-          '<td data-label="Annual Quota"><strong>' + (pol.AnnualAllocation || 0) + ' days</strong></td>' +
-          '<td data-label="Max Duration">' + (pol.MaximumDuration || 30) + ' d/request</td>' +
-          '<td data-label="Notice Days">' + (pol.NoticePeriod || 0) + ' day(s)</td>' +
-          '<td data-label="Weekends Policy">' + (pol.WeekendsPolicy || 'EXCLUDE_SUNDAYS') + '</td>' +
-          '<td data-label="Balance Required">' + (t.RequiresBalance ? '<span class="text-success font-semibold">Yes</span>' : '<span class="text-muted">No (e.g. LOP)</span>') + '</td>' +
-          '<td data-label="Status">' +
-            '<span class="badge ' + (isActive ? 'badge-approved' : 'badge-rejected') + '">' + (isActive ? 'Active' : 'Disabled') + '</span>' +
-          '</td>' +
-          '<td data-label="Actions">' +
-            '<button type="button" class="btn btn-outline btn-sm action-edit-policy" data-type-id="' + t.LeaveTypeID + '" data-policy-id="' + (pol.PolicyID || '') + '" data-alloc="' + (pol.AnnualAllocation || 0) + '" data-max="' + (pol.MaximumDuration || 30) + '" data-notice="' + (pol.NoticePeriod || 0) + '" data-name="' + escapeHtml(t.LeaveTypeName) + '">Edit Policy</button>' +
-          '</td>' +
-        '</tr>';
+        '<div class="policy-expanded-card">' +
+          '<div class="policy-expanded-header">' +
+            '<div>' +
+              '<h3 style="font-size: 1.15rem; color: var(--color-primary-900); margin-bottom: 4px;">' + escapeHtml(t.LeaveTypeName) + '</h3>' +
+              '<span class="badge badge-role-employee text-xs">' + escapeHtml(t.LeaveTypeID) + '</span>' +
+            '</div>' +
+            '<span class="badge ' + (isActive ? 'badge-approved' : 'badge-rejected') + '">' + (isActive ? 'Active Category' : 'Disabled') + '</span>' +
+          '</div>' +
+
+          '<div class="policy-expanded-body">' +
+            '<p class="text-sm text-muted" style="margin: 0; min-height: 40px;">' + escapeHtml(t.Description || 'Standard hospital leave category.') + '</p>' +
+
+            // 4 Key Metrics Box
+            '<div class="policy-metrics-grid">' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Annual Quota</span>' +
+                '<span class="policy-metric-val" style="color: var(--color-teal-600);">' + (pol.AnnualAllocation || 0) + ' <small class="text-xs text-muted" style="font-weight: 500;">days/yr</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Max Duration</span>' +
+                '<span class="policy-metric-val">' + (pol.MaximumDuration || 30) + ' <small class="text-xs text-muted" style="font-weight: 500;">days/req</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Advance Notice</span>' +
+                '<span class="policy-metric-val">' + (pol.NoticePeriod || 0) + ' <small class="text-xs text-muted" style="font-weight: 500;">day(s)</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Balance Required</span>' +
+                '<span class="policy-metric-val" style="font-size: 1.05rem;">' + (t.RequiresBalance ? '<span style="color: var(--color-success);">&check; Yes</span>' : '<span style="color: var(--color-text-muted);">&cross; No (LOP)</span>') + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            // Weekend & Holiday Counting Rules Chips
+            '<div>' +
+              '<div class="text-xs font-semibold text-muted mb-xs" style="text-transform: uppercase;">Deduction &amp; Counting Policies:</div>' +
+              '<div class="policy-chips-row">' +
+                '<span class="policy-chip policy-chip-teal" title="Weekend counting policy">' +
+                  '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>' +
+                  '<span>' + weekendText + '</span>' +
+                '</span>' +
+                '<span class="policy-chip policy-chip-teal" title="Hospital holiday deduction policy">' +
+                  '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M19 3v4M2 11h20M7 16h2M15 16h2"/></svg>' +
+                  '<span>' + holidayText + '</span>' +
+                '</span>' +
+                '<span class="policy-chip" title="Accrual schedule">' +
+                  '<span>Accrual: ' + (pol.AccrualRule || 'ANNUAL_UPFRONT').replace('_', ' ') + '</span>' +
+                '</span>' +
+                '<span class="policy-chip" title="Carry-forward policy">' +
+                  '<span>Carry: ' + (pol.CarryForwardRule || 'NO_CARRY_FORWARD').replace(/_/g, ' ') + '</span>' +
+                '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--color-border);" class="flex justify-between items-center">' +
+              '<span class="text-xs text-muted">ID: <code>' + t.LeaveTypeID + '</code></span>' +
+              '<button type="button" class="btn btn-outline btn-sm action-edit-policy" data-type-id="' + t.LeaveTypeID + '" data-policy-id="' + (pol.PolicyID || '') + '" data-alloc="' + (pol.AnnualAllocation || 0) + '" data-max="' + (pol.MaximumDuration || 30) + '" data-notice="' + (pol.NoticePeriod || 0) + '" data-name="' + escapeHtml(t.LeaveTypeName) + '">' +
+                '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                '<span>Edit Policy &amp; Rules</span>' +
+              '</button>' +
+            '</div>' +
+
+          '</div>' +
+        '</div>';
     }
 
-    html += '</tbody></table></div></div>' +
+    html += '</div></div>' +
 
       // 2. Hospital Holidays Calendar Section
       '<div class="card">' +

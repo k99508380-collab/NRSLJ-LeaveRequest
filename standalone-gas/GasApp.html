@@ -109,6 +109,7 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  min-height: 100%;
 }
 
 body {
@@ -119,8 +120,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Accessibility: Focus visible */
@@ -161,7 +164,7 @@ button, input, select, textarea {
   color: inherit;
 }
 
-/* Application Shell Layout */
+/* Application Shell Layout - Natural Full-Page Scrolling */
 #app-root {
   min-height: 100vh;
   display: flex;
@@ -172,7 +175,8 @@ button, input, select, textarea {
   display: flex;
   flex: 1;
   position: relative;
-  overflow: hidden;
+  min-height: calc(100vh - var(--header-height));
+  overflow: visible;
 }
 
 .main-content {
@@ -181,9 +185,10 @@ button, input, select, textarea {
   flex-direction: column;
   min-width: 0;
   background-color: var(--color-bg);
-  overflow-y: auto;
-  height: calc(100vh - var(--header-height));
-  padding: var(--space-lg);
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  padding: var(--space-xl) var(--space-lg);
 }
 
 /* Utility Helpers */
@@ -389,6 +394,8 @@ button, input, select, textarea {
   flex-direction: column;
   flex-shrink: 0;
   height: calc(100vh - var(--header-height));
+  position: sticky;
+  top: var(--header-height);
   border-right: 1px solid var(--color-primary-800);
   transition: transform var(--transition-normal);
   z-index: 30;
@@ -1071,6 +1078,209 @@ button, input, select, textarea {
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* ==========================================================================
+   11. Expanded Policy, Request & Staff Attendance Components
+   ========================================================================== */
+.policy-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.policy-expanded-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-top: 4px solid var(--color-teal-600);
+}
+
+.policy-expanded-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.policy-expanded-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-surface-hover) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.policy-expanded-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.policy-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.policy-metric-box {
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.policy-metric-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.policy-metric-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-primary-900);
+  line-height: 1.2;
+}
+
+.policy-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.policy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.policy-chip-teal {
+  background-color: var(--color-teal-50);
+  border-color: var(--color-teal-100);
+  color: var(--color-teal-700);
+}
+
+/* Expanded Pending Request Cards */
+.pending-requests-deck {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.pending-request-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all var(--transition-fast);
+}
+
+.pending-request-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-teal-500);
+}
+
+.pending-request-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pending-request-mid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 820px) {
+  .pending-request-mid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pending-reason-box {
+  background: var(--color-surface-hover);
+  border-left: 4px solid var(--color-teal-600);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  line-height: 1.5;
+}
+
+/* Expanded Staff On Leave Cards */
+.staff-on-leave-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.staff-on-leave-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.staff-on-leave-card:hover {
+  border-color: var(--color-teal-500);
+  box-shadow: var(--shadow-md);
+}
+
+.staff-avatar-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-teal-100);
+  color: var(--color-teal-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.staff-on-leave-info {
+  flex: 1;
+  min-width: 0;
+}
+
+
+
 /**
  * NRSLJ SPECIALITY HOSPITALS, MUSIRI
  * Responsive Breakpoints & Mobile Touch Optimizations
@@ -1093,7 +1303,9 @@ button, input, select, textarea {
 
   .main-content {
     padding: var(--space-md);
-    height: calc(100vh - var(--header-height));
+    height: auto;
+    min-height: calc(100vh - var(--header-height));
+    overflow: visible;
   }
 
   /* Hamburger toggle button */
@@ -2504,7 +2716,7 @@ window.NRSLJ_EMPLOYEE_DASHBOARD = (function() {
             '<td data-label="Leave Type">' + escapeHtml(r.LeaveTypeName || r.LeaveTypeID) + '</td>' +
             '<td data-label="Dates">' + r.StartDate + (r.StartDate !== r.EndDate ? ' to ' + r.EndDate : '') + '</td>' +
             '<td data-label="Days">' + r.RequestedDays + ' (' + r.DayPart + ')</td>' +
-            '<td data-label="Reason" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + escapeHtml(r.Reason) + '</td>' +
+            '<td data-label="Reason" style="max-width: 260px; word-break: break-word;" title="' + escapeHtml(r.Reason) + '">' + escapeHtml(r.Reason) + '</td>' +
             '<td data-label="Status"><span class="badge ' + badgeCls + '">' + r.Status.replace('_', ' ') + '</span></td>' +
             '<td data-label="Submitted">' + (r.SubmittedAt ? r.SubmittedAt.substring(0, 10) : '') + '</td>' +
           '</tr>';
@@ -3035,7 +3247,7 @@ window.NRSLJ_LEAVE_HISTORY_VIEW = (function() {
           '<td data-label="Leave Type">' + escapeHtml(r.LeaveTypeName || r.LeaveTypeID) + '</td>' +
           '<td data-label="Dates">' + r.StartDate + (r.StartDate !== r.EndDate ? ' to ' + r.EndDate : '') + '</td>' +
           '<td data-label="Days">' + r.RequestedDays + ' (' + r.DayPart + ')</td>' +
-          '<td data-label="Reason" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + escapeHtml(r.Reason) + '</td>' +
+          '<td data-label="Reason" style="max-width: 260px; word-break: break-word;" title="' + escapeHtml(r.Reason) + '">' + escapeHtml(r.Reason) + '</td>' +
           '<td data-label="Status"><span class="badge ' + badgeCls + '">' + r.Status.replace('_', ' ') + '</span></td>' +
           '<td data-label="Submitted">' + (r.SubmittedAt ? r.SubmittedAt.substring(0, 10) : '') + '</td>' +
           '<td data-label="Actions">' +
@@ -3236,105 +3448,135 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
         '</div>' +
       '</div>' +
 
-      // Pending Approvals Table Card
+      // Pending Approvals Section (Expanded Cards)
       '<div class="card mb-lg">' +
         '<div class="card-header">' +
           '<div>' +
             '<div class="card-title">Pending Leave Requests</div>' +
-            '<div class="card-subtitle">Requests requiring your review and recommendation</div>' +
+            '<div class="card-subtitle">Requests requiring your review and recommendation &bull; Full details and reasons</div>' +
           '</div>' +
+          '<span class="badge badge-pending" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' + pending.length + ' Pending</span>' +
         '</div>' +
-        '<div class="table-responsive">' +
-          '<table class="data-table table-responsive-cards">' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Employee</th>' +
-                '<th>Department / Role</th>' +
-                '<th>Leave Type</th>' +
-                '<th>Dates & Duration</th>' +
-                '<th>Reason</th>' +
-                '<th>Submitted</th>' +
-                '<th>Review Action</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody>';
+        '<div class="card-body" style="padding: 20px;">';
 
     if (pending.length === 0) {
-      html += '<tr><td colspan="7" class="text-center text-muted" style="padding: 40px;">No pending leave requests awaiting your action. Good job!</td></tr>';
+      html += '' +
+        '<div class="text-center text-muted" style="padding: 40px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
+          '<div style="font-size: 2rem; margin-bottom: 8px;">🎉</div>' +
+          '<div style="font-weight: 600; font-size: 1rem; color: var(--color-text-main);">No Pending Leave Requests</div>' +
+          '<p class="text-sm text-muted" style="margin-top: 4px;">All employee leave applications assigned to you have been reviewed.</p>' +
+        '</div>';
     } else {
+      html += '<div class="pending-requests-deck">';
       for (var i = 0; i < pending.length; i++) {
         var req = pending[i];
+        var initials = (req.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = req.StartDate === req.EndDate;
+        var dateDisplay = isSingleDay ? req.StartDate : (req.StartDate + ' &rarr; ' + req.EndDate);
+
         html += '' +
-          '<tr>' +
-            '<td data-label="Employee">' +
-              '<strong>' + escapeHtml(req.FullName) + '</strong><br>' +
-              '<span class="text-xs text-muted">ID: ' + escapeHtml(req.EmployeeID) + '</span>' +
-            '</td>' +
-            '<td data-label="Department / Role">' +
-              '<span>' + escapeHtml(req.DepartmentName) + '</span><br>' +
-              '<span class="text-xs text-muted">' + escapeHtml(req.DesignationName) + '</span>' +
-            '</td>' +
-            '<td data-label="Leave Type">' +
-              '<span class="badge badge-active">' + escapeHtml(req.LeaveTypeName) + '</span>' +
-            '</td>' +
-            '<td data-label="Dates & Duration">' +
-              '<span>' + req.StartDate + (req.StartDate !== req.EndDate ? ' to ' + req.EndDate : '') + '</span><br>' +
-              '<strong class="text-xs" style="color: var(--color-teal-700);">' + req.RequestedDays + ' day(s) (' + req.DayPart + ')</strong>' +
-            '</td>' +
-            '<td data-label="Reason" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="' + escapeHtml(req.Reason) + '">' +
-              escapeHtml(req.Reason) +
-            '</td>' +
-            '<td data-label="Submitted">' + (req.SubmittedAt ? req.SubmittedAt.substring(0, 10) : '') + '</td>' +
-            '<td data-label="Review Action">' +
-              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '">' +
+          '<div class="pending-request-card">' +
+            '<div class="pending-request-top">' +
+              '<div class="flex items-center gap-md">' +
+                '<div class="staff-avatar-placeholder">' + initials + '</div>' +
+                '<div>' +
+                  '<div style="font-weight: 700; font-size: 1.05rem; color: var(--color-primary-900);">' + escapeHtml(req.FullName) + '</div>' +
+                  '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                    '<span class="badge" style="background: var(--color-surface-hover); border: 1px solid var(--color-border); margin-right: 6px; font-weight: 600;">ID: ' + escapeHtml(req.EmployeeID) + '</span>' +
+                    '<span>' + escapeHtml(req.DepartmentName) + ' &bull; ' + escapeHtml(req.DesignationName) + '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-sm">' +
+                '<span class="badge badge-active" style="font-size: 0.85rem; padding: 5px 12px; font-weight: 600;">' + escapeHtml(req.LeaveTypeName) + '</span>' +
+                '<span class="text-xs text-muted">Submitted ' + (req.SubmittedAt ? req.SubmittedAt.substring(0, 10) : '') + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="pending-request-mid">' +
+              '<div style="display: flex; flex-direction: column; gap: 8px;">' +
+                '<div style="background: var(--color-surface-hover); border-radius: var(--radius-md); padding: 12px 14px; border: 1px solid var(--color-border);">' +
+                  '<div class="text-xs text-muted" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Requested Dates</div>' +
+                  '<div style="font-weight: 700; font-size: 1rem; color: var(--color-primary-900); margin-top: 4px;">' + dateDisplay + '</div>' +
+                  '<div style="margin-top: 6px;">' +
+                    '<span class="badge badge-teal" style="font-size: 0.8rem; font-weight: 700;">' + req.RequestedDays + ' Day(s) (' + req.DayPart + ')</span>' +
+                  '</div>' +
+                '</div>' +
+                (req.EmergencyContact ? ('<div class="text-xs text-muted"><strong>Emergency Contact:</strong> ' + escapeHtml(req.EmergencyContact) + '</div>') : '') +
+              '</div>' +
+
+              '<div>' +
+                '<div class="text-xs text-muted" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Reason for Leave Request:</div>' +
+                '<div class="pending-reason-box">' +
+                  escapeHtml(req.Reason || 'No reason provided.') +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="flex justify-between items-center" style="padding-top: 12px; border-top: 1px solid var(--color-border); flex-wrap: wrap; gap: 10px;">' +
+              '<div class="text-xs text-muted">Request Ref: <code style="font-weight: 600; color: var(--color-primary-900);">' + escapeHtml(req.RequestID) + '</code></div>' +
+              '<button type="button" class="btn btn-primary btn-sm review-req-btn" data-json="' + escapeHtml(JSON.stringify(req)) + '" style="padding: 8px 20px; font-weight: 600;">' +
+                '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' +
                 '<span>Review & Decide</span>' +
               '</button>' +
-            '</td>' +
-          '</tr>';
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>';
+    html += '</div></div>';
 
-    // Staff On Leave Today Section
+    // Staff On Leave Today Section (Expanded Cards)
     html += '<div class="card">' +
       '<div class="card-header">' +
         '<div>' +
           '<div class="card-title">Hospital Staff on Leave Today</div>' +
-          '<div class="card-subtitle">Active absences across departments for duty roster planning</div>' +
+          '<div class="card-subtitle">Active absences across departments for duty roster planning &bull; ' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
         '</div>' +
+        '<span class="badge badge-teal" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 700;">' + (metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + ' On Leave</span>' +
       '</div>' +
-      '<div class="table-responsive">' +
-        '<table class="data-table table-responsive-cards">' +
-          '<thead>' +
-            '<tr>' +
-              '<th>Employee</th>' +
-              '<th>Department</th>' +
-              '<th>Leave Type</th>' +
-              '<th>Duration</th>' +
-              '<th>Day Part</th>' +
-            '</tr>' +
-          '</thead>' +
-          '<tbody>';
+      '<div class="card-body" style="padding: 20px;">';
 
     var onLeave = metrics.onLeaveToday || [];
     if (onLeave.length === 0) {
-      html += '<tr><td colspan="5" class="text-center text-muted" style="padding: 24px;">No hospital staff on approved leave today.</td></tr>';
+      html += '' +
+        '<div class="text-center text-muted" style="padding: 36px 20px; background: var(--color-surface-hover); border-radius: var(--radius-lg); border: 1px dashed var(--color-border);">' +
+          '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
+          '<div style="font-weight: 600; color: var(--color-text-main);">All Hospital Staff on Duty Today</div>' +
+          '<p class="text-sm text-muted" style="margin-top: 4px;">No approved leaves recorded for today. Full staffing across all hospital departments.</p>' +
+        '</div>';
     } else {
+      html += '<div class="staff-on-leave-grid">';
       for (var j = 0; j < onLeave.length; j++) {
         var ol = onLeave[j];
+        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = ol.StartDate === ol.EndDate;
+        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' to ' + ol.EndDate);
+
         html += '' +
-          '<tr>' +
-            '<td data-label="Employee"><strong>' + escapeHtml(ol.FullName) + '</strong> (' + escapeHtml(ol.EmployeeId) + ')</td>' +
-            '<td data-label="Department">' + escapeHtml(ol.DepartmentName) + '</td>' +
-            '<td data-label="Leave Type"><span class="badge badge-active">' + escapeHtml(ol.LeaveType) + '</span></td>' +
-            '<td data-label="Duration">' + ol.StartDate + ' to ' + ol.EndDate + '</td>' +
-            '<td data-label="Day Part">' + ol.DayPart + '</td>' +
-          '</tr>';
+          '<div class="staff-on-leave-card">' +
+            '<div class="staff-avatar-placeholder">' + olInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center" style="gap: 8px;">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.95rem;">' + escapeHtml(ol.FullName) + '</strong>' +
+                '<span class="badge badge-active" style="font-size: 0.75rem;">' + escapeHtml(ol.LeaveType) + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
+                (ol.EmployeeId ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId)) : '') +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--color-border);">' +
+                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
+                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>';
+    html += '</div></div>';
 
     container.innerHTML = html;
 
@@ -3544,33 +3786,51 @@ window.NRSLJ_ADMIN_DASHBOARD = (function() {
         '<div class="card">' +
           '<div class="card-header">' +
             '<div>' +
-              '<div class="card-title">Staff on Leave Today</div>' +
+              '<div class="card-title">Hospital Staff on Leave Today</div>' +
               '<div class="card-subtitle">' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
             '</div>' +
+            '<span class="badge badge-teal" style="font-size: 0.8rem; padding: 4px 10px; font-weight: 700;">' + (metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + ' On Leave</span>' +
           '</div>' +
-          '<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">' +
-            '<table class="data-table">' +
-              '<thead>' +
-                '<tr><th>Staff</th><th>Dept</th><th>Type</th><th>Duration</th></tr>' +
-              '</thead>' +
-              '<tbody>';
+          '<div class="card-body" style="padding: 16px;">';
 
     var onLeave = metrics.onLeaveToday || [];
     if (onLeave.length === 0) {
-      html += '<tr><td colspan="4" class="text-center text-muted" style="padding: 24px;">No staff on leave today. All hospital units at normal staffing.</td></tr>';
+      html += '<div class="text-center text-muted" style="padding: 30px 16px;">' +
+        '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
+        '<div style="font-weight: 600; color: var(--color-text-main);">No Staff on Leave Today</div>' +
+        '<p class="text-xs text-muted" style="margin-top: 2px;">All hospital departments operating at standard staffing.</p>' +
+      '</div>';
     } else {
+      html += '<div class="flex flex-col gap-sm">';
       for (var i = 0; i < onLeave.length; i++) {
         var ol = onLeave[i];
-        html += '<tr>' +
-          '<td><strong>' + escapeHtml(ol.FullName) + '</strong><br><span class="text-xs text-muted">' + escapeHtml(ol.EmployeeId) + '</span></td>' +
-          '<td>' + escapeHtml(ol.DepartmentName) + '</td>' +
-          '<td><span class="badge badge-active">' + escapeHtml(ol.LeaveType) + '</span></td>' +
-          '<td class="text-xs">' + ol.StartDate + (ol.StartDate !== ol.EndDate ? ' to ' + ol.EndDate : '') + '</td>' +
-        '</tr>';
+        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = ol.StartDate === ol.EndDate;
+        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' &rarr; ' + ol.EndDate);
+
+        html += '' +
+          '<div class="staff-on-leave-card" style="box-shadow: none; border-color: var(--color-border); padding: 12px 14px;">' +
+            '<div class="staff-avatar-placeholder" style="width: 38px; height: 38px; font-size: 0.85rem;">' + olInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.9rem;">' + escapeHtml(ol.FullName) + '</strong>' +
+                '<span class="badge badge-active" style="font-size: 0.72rem; padding: 2px 8px;">' + escapeHtml(ol.LeaveType) + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
+                (ol.EmployeeId ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId)) : '') +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed var(--color-border);">' +
+                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
+                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>' +
+    html += '</div></div>' +
 
         // Department Utilization Breakdown
         '<div class="card">' +
@@ -4286,56 +4546,92 @@ window.NRSLJ_ADMIN_LEAVE_CONFIG_VIEW = (function() {
         '</div>' +
       '</div>' +
 
-      // 1. Leave Categories & Policy Table
-      '<div class="card mb-lg">' +
-        '<div class="card-header">' +
+      // 1. Leave Categories & Policy Section - Expanded Clear View
+      '<div class="mb-xl">' +
+        '<div class="flex justify-between items-center mb-md flex-wrap gap-sm">' +
           '<div>' +
-            '<div class="card-title">Configured Leave Types & Rules</div>' +
-            '<div class="card-subtitle">Annual allowances, notice requirements & weekend/holiday counting rules</div>' +
+            '<h2 style="color: var(--color-primary-900); font-size: 1.25rem;">Configured Leave Types & Rules</h2>' +
+            '<p class="text-sm text-muted">Annual allowances, notice requirements &amp; weekend/holiday counting rules for all hospital units</p>' +
           '</div>' +
         '</div>' +
-        '<div class="table-responsive">' +
-          '<table class="data-table table-responsive-cards">' +
-            '<thead>' +
-              '<tr>' +
-                '<th>Category Name</th>' +
-                '<th>Annual Quota</th>' +
-                '<th>Max Duration</th>' +
-                '<th>Notice Days</th>' +
-                '<th>Weekends Policy</th>' +
-                '<th>Balance Required</th>' +
-                '<th>Status</th>' +
-                '<th>Actions</th>' +
-              '</tr>' +
-            '</thead>' +
-            '<tbody>';
+
+        // Expanded Policy Cards Grid
+        '<div class="policy-card-grid mb-lg">';
 
     for (var i = 0; i < types.length; i++) {
       var t = types[i];
       var pol = policyMap[t.LeaveTypeID] || {};
       var isActive = t.IsActive === true || t.IsActive === 'TRUE' || t.IsActive === 'true';
+      var weekendText = pol.WeekendsPolicy === 'EXCLUDE_SUNDAYS' ? 'Sundays Excluded' : (pol.WeekendsPolicy === 'EXCLUDE_WEEKENDS' ? 'Sat & Sun Excluded' : 'All Days Counted');
+      var holidayText = pol.HolidaysPolicy === 'EXCLUDE_HOLIDAYS' ? 'Hospital Holidays Excluded' : 'Holidays Counted';
 
       html += '' +
-        '<tr>' +
-          '<td data-label="Category Name">' +
-            '<strong>' + escapeHtml(t.LeaveTypeName) + '</strong><br>' +
-            '<span class="text-xs text-muted">' + escapeHtml(t.Description || 'No description') + '</span>' +
-          '</td>' +
-          '<td data-label="Annual Quota"><strong>' + (pol.AnnualAllocation || 0) + ' days</strong></td>' +
-          '<td data-label="Max Duration">' + (pol.MaximumDuration || 30) + ' d/request</td>' +
-          '<td data-label="Notice Days">' + (pol.NoticePeriod || 0) + ' day(s)</td>' +
-          '<td data-label="Weekends Policy">' + (pol.WeekendsPolicy || 'EXCLUDE_SUNDAYS') + '</td>' +
-          '<td data-label="Balance Required">' + (t.RequiresBalance ? '<span class="text-success font-semibold">Yes</span>' : '<span class="text-muted">No (e.g. LOP)</span>') + '</td>' +
-          '<td data-label="Status">' +
-            '<span class="badge ' + (isActive ? 'badge-approved' : 'badge-rejected') + '">' + (isActive ? 'Active' : 'Disabled') + '</span>' +
-          '</td>' +
-          '<td data-label="Actions">' +
-            '<button type="button" class="btn btn-outline btn-sm action-edit-policy" data-type-id="' + t.LeaveTypeID + '" data-policy-id="' + (pol.PolicyID || '') + '" data-alloc="' + (pol.AnnualAllocation || 0) + '" data-max="' + (pol.MaximumDuration || 30) + '" data-notice="' + (pol.NoticePeriod || 0) + '" data-name="' + escapeHtml(t.LeaveTypeName) + '">Edit Policy</button>' +
-          '</td>' +
-        '</tr>';
+        '<div class="policy-expanded-card">' +
+          '<div class="policy-expanded-header">' +
+            '<div>' +
+              '<h3 style="font-size: 1.15rem; color: var(--color-primary-900); margin-bottom: 4px;">' + escapeHtml(t.LeaveTypeName) + '</h3>' +
+              '<span class="badge badge-role-employee text-xs">' + escapeHtml(t.LeaveTypeID) + '</span>' +
+            '</div>' +
+            '<span class="badge ' + (isActive ? 'badge-approved' : 'badge-rejected') + '">' + (isActive ? 'Active Category' : 'Disabled') + '</span>' +
+          '</div>' +
+
+          '<div class="policy-expanded-body">' +
+            '<p class="text-sm text-muted" style="margin: 0; min-height: 40px;">' + escapeHtml(t.Description || 'Standard hospital leave category.') + '</p>' +
+
+            // 4 Key Metrics Box
+            '<div class="policy-metrics-grid">' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Annual Quota</span>' +
+                '<span class="policy-metric-val" style="color: var(--color-teal-600);">' + (pol.AnnualAllocation || 0) + ' <small class="text-xs text-muted" style="font-weight: 500;">days/yr</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Max Duration</span>' +
+                '<span class="policy-metric-val">' + (pol.MaximumDuration || 30) + ' <small class="text-xs text-muted" style="font-weight: 500;">days/req</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Advance Notice</span>' +
+                '<span class="policy-metric-val">' + (pol.NoticePeriod || 0) + ' <small class="text-xs text-muted" style="font-weight: 500;">day(s)</small></span>' +
+              '</div>' +
+              '<div class="policy-metric-box">' +
+                '<span class="policy-metric-label">Balance Required</span>' +
+                '<span class="policy-metric-val" style="font-size: 1.05rem;">' + (t.RequiresBalance ? '<span style="color: var(--color-success);">&check; Yes</span>' : '<span style="color: var(--color-text-muted);">&cross; No (LOP)</span>') + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            // Weekend & Holiday Counting Rules Chips
+            '<div>' +
+              '<div class="text-xs font-semibold text-muted mb-xs" style="text-transform: uppercase;">Deduction &amp; Counting Policies:</div>' +
+              '<div class="policy-chips-row">' +
+                '<span class="policy-chip policy-chip-teal" title="Weekend counting policy">' +
+                  '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>' +
+                  '<span>' + weekendText + '</span>' +
+                '</span>' +
+                '<span class="policy-chip policy-chip-teal" title="Hospital holiday deduction policy">' +
+                  '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M19 3v4M2 11h20M7 16h2M15 16h2"/></svg>' +
+                  '<span>' + holidayText + '</span>' +
+                '</span>' +
+                '<span class="policy-chip" title="Accrual schedule">' +
+                  '<span>Accrual: ' + (pol.AccrualRule || 'ANNUAL_UPFRONT').replace('_', ' ') + '</span>' +
+                '</span>' +
+                '<span class="policy-chip" title="Carry-forward policy">' +
+                  '<span>Carry: ' + (pol.CarryForwardRule || 'NO_CARRY_FORWARD').replace(/_/g, ' ') + '</span>' +
+                '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--color-border);" class="flex justify-between items-center">' +
+              '<span class="text-xs text-muted">ID: <code>' + t.LeaveTypeID + '</code></span>' +
+              '<button type="button" class="btn btn-outline btn-sm action-edit-policy" data-type-id="' + t.LeaveTypeID + '" data-policy-id="' + (pol.PolicyID || '') + '" data-alloc="' + (pol.AnnualAllocation || 0) + '" data-max="' + (pol.MaximumDuration || 30) + '" data-notice="' + (pol.NoticePeriod || 0) + '" data-name="' + escapeHtml(t.LeaveTypeName) + '">' +
+                '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                '<span>Edit Policy &amp; Rules</span>' +
+              '</button>' +
+            '</div>' +
+
+          '</div>' +
+        '</div>';
     }
 
-    html += '</tbody></table></div></div>' +
+    html += '</div></div>' +
 
       // 2. Hospital Holidays Calendar Section
       '<div class="card">' +

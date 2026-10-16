@@ -101,33 +101,51 @@ window.NRSLJ_ADMIN_DASHBOARD = (function() {
         '<div class="card">' +
           '<div class="card-header">' +
             '<div>' +
-              '<div class="card-title">Staff on Leave Today</div>' +
+              '<div class="card-title">Hospital Staff on Leave Today</div>' +
               '<div class="card-subtitle">' + new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</div>' +
             '</div>' +
+            '<span class="badge badge-teal" style="font-size: 0.8rem; padding: 4px 10px; font-weight: 700;">' + (metrics.onLeaveToday ? metrics.onLeaveToday.length : 0) + ' On Leave</span>' +
           '</div>' +
-          '<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">' +
-            '<table class="data-table">' +
-              '<thead>' +
-                '<tr><th>Staff</th><th>Dept</th><th>Type</th><th>Duration</th></tr>' +
-              '</thead>' +
-              '<tbody>';
+          '<div class="card-body" style="padding: 16px;">';
 
     var onLeave = metrics.onLeaveToday || [];
     if (onLeave.length === 0) {
-      html += '<tr><td colspan="4" class="text-center text-muted" style="padding: 24px;">No staff on leave today. All hospital units at normal staffing.</td></tr>';
+      html += '<div class="text-center text-muted" style="padding: 30px 16px;">' +
+        '<div style="font-size: 1.8rem; margin-bottom: 6px;">🏥</div>' +
+        '<div style="font-weight: 600; color: var(--color-text-main);">No Staff on Leave Today</div>' +
+        '<p class="text-xs text-muted" style="margin-top: 2px;">All hospital departments operating at standard staffing.</p>' +
+      '</div>';
     } else {
+      html += '<div class="flex flex-col gap-sm">';
       for (var i = 0; i < onLeave.length; i++) {
         var ol = onLeave[i];
-        html += '<tr>' +
-          '<td><strong>' + escapeHtml(ol.FullName) + '</strong><br><span class="text-xs text-muted">' + escapeHtml(ol.EmployeeId) + '</span></td>' +
-          '<td>' + escapeHtml(ol.DepartmentName) + '</td>' +
-          '<td><span class="badge badge-active">' + escapeHtml(ol.LeaveType) + '</span></td>' +
-          '<td class="text-xs">' + ol.StartDate + (ol.StartDate !== ol.EndDate ? ' to ' + ol.EndDate : '') + '</td>' +
-        '</tr>';
+        var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
+        var isSingleDay = ol.StartDate === ol.EndDate;
+        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' &rarr; ' + ol.EndDate);
+
+        html += '' +
+          '<div class="staff-on-leave-card" style="box-shadow: none; border-color: var(--color-border); padding: 12px 14px;">' +
+            '<div class="staff-avatar-placeholder" style="width: 38px; height: 38px; font-size: 0.85rem;">' + olInitials + '</div>' +
+            '<div class="staff-on-leave-info">' +
+              '<div class="flex justify-between items-center">' +
+                '<strong style="color: var(--color-primary-900); font-size: 0.9rem;">' + escapeHtml(ol.FullName) + '</strong>' +
+                '<span class="badge badge-active" style="font-size: 0.72rem; padding: 2px 8px;">' + escapeHtml(ol.LeaveType) + '</span>' +
+              '</div>' +
+              '<div class="text-xs text-muted" style="margin-top: 2px;">' +
+                '<span>' + escapeHtml(ol.DepartmentName) + '</span>' +
+                (ol.EmployeeId ? (' &bull; ID: ' + escapeHtml(ol.EmployeeId)) : '') +
+              '</div>' +
+              '<div class="flex justify-between items-center text-xs" style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed var(--color-border);">' +
+                '<span style="color: var(--color-teal-700); font-weight: 600;">' + dateRange + '</span>' +
+                '<span class="text-muted">' + (ol.DayPart || 'Full Day') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
       }
+      html += '</div>';
     }
 
-    html += '</tbody></table></div></div>' +
+    html += '</div></div>' +
 
         // Department Utilization Breakdown
         '<div class="card">' +
