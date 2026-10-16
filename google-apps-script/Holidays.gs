@@ -68,10 +68,10 @@ function deleteHoliday(sessionUser, holidayId) {
  */
 function calculateLeaveDays(startDateStr, endDateStr, dayPart, departmentId, weekendsPolicy, holidaysPolicy) {
   if (!startDateStr || !endDateStr) return 0;
-  var start = new Date(startDateStr + 'T00:00:00');
-  var end = new Date(endDateStr + 'T00:00:00');
+  var start = parseDateOnly(startDateStr);
+  var end = parseDateOnly(endDateStr);
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new Error('Invalid date format. Expected YYYY-MM-DD');
   }
 

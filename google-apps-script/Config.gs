@@ -176,6 +176,48 @@ function getSheet(sheetName) {
 }
 
 /**
+ * Safely parses any date input (Date object, ISO string, YYYY-MM-DD string) into a Date object at midnight
+ */
+function parseDateOnly(val) {
+  if (!val) return null;
+  if (val instanceof Date) {
+    if (isNaN(val.getTime())) return null;
+    var y = val.getFullYear();
+    var m = val.getMonth() + 1;
+    var d = val.getDate();
+    return new Date(y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d + 'T00:00:00');
+  }
+  var str = String(val).trim();
+  if (str.indexOf('T') !== -1) {
+    str = str.split('T')[0];
+  }
+  if (str.indexOf(' ') !== -1) {
+    str = str.split(' ')[0];
+  }
+  var parts = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if (parts) {
+    var year = parts[1];
+    var month = (parts[2].length === 1 ? '0' : '') + parts[2];
+    var day = (parts[3].length === 1 ? '0' : '') + parts[3];
+    return new Date(year + '-' + month + '-' + day + 'T00:00:00');
+  }
+  var parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/**
+ * Safely formats any date input into a clean YYYY-MM-DD string
+ */
+function formatDateOnlyStr(val) {
+  var d = parseDateOnly(val);
+  if (!d) return String(val || '').split('T')[0];
+  var y = d.getFullYear();
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return y + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+}
+
+/**
  * Reads all rows from a sheet as an array of plain JavaScript objects
  */
 function readAllRows(sheetName) {
@@ -206,9 +248,17 @@ function readAllRows(sheetName) {
     for (var j = 0; j < headers.length; j++) {
       var header = headers[j];
       var cellVal = rowData[j];
-      // Normalize Date objects to ISO strings if needed
+      // Normalize Date objects to clean YYYY-MM-DD or ISO timestamp strings
       if (cellVal instanceof Date) {
-        cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        if (header === 'StartDate' || header === 'EndDate' || header === 'Date') {
+          cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', 'yyyy-MM-dd');
+        } else {
+          cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        }
+      } else if (header === 'StartDate' || header === 'EndDate' || header === 'Date') {
+        if (typeof cellVal === 'string' && cellVal.indexOf('T') !== -1) {
+          cellVal = cellVal.split('T')[0];
+        }
       }
       obj[header] = cellVal;
     }

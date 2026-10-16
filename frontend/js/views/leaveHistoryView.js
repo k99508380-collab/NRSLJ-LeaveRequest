@@ -143,7 +143,7 @@ window.NRSLJ_LEAVE_HISTORY_VIEW = (function() {
         '<tr data-reqid="' + r.RequestID + '">' +
           '<td data-label="Request ID"><strong style="color: var(--color-primary-900);">' + escapeHtml(r.RequestID) + '</strong></td>' +
           '<td data-label="Leave Type">' + escapeHtml(r.LeaveTypeName || r.LeaveTypeID) + '</td>' +
-          '<td data-label="Dates">' + r.StartDate + (r.StartDate !== r.EndDate ? ' to ' + r.EndDate : '') + '</td>' +
+          '<td data-label="Dates">' + window.NRSLJ_CONFIG.formatDate(r.StartDate) + (r.StartDate !== r.EndDate ? (' to ' + window.NRSLJ_CONFIG.formatDate(r.EndDate)) : '') + '</td>' +
           '<td data-label="Days">' + r.RequestedDays + ' (' + r.DayPart + ')</td>' +
           '<td data-label="Reason" style="max-width: 260px; word-break: break-word;" title="' + escapeHtml(r.Reason) + '">' + escapeHtml(r.Reason) + '</td>' +
           '<td data-label="Status"><span class="badge ' + badgeCls + '">' + r.Status.replace('_', ' ') + '</span></td>' +

@@ -107,8 +107,10 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
       for (var i = 0; i < pending.length; i++) {
         var req = pending[i];
         var initials = (req.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = req.StartDate === req.EndDate;
-        var dateDisplay = isSingleDay ? req.StartDate : (req.StartDate + ' &rarr; ' + req.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(req.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(req.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateDisplay = isSingleDay ? sDate : (sDate + ' &rarr; ' + eDate);
 
         html += '' +
           '<div class="pending-request-card">' +
@@ -187,8 +189,10 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
       for (var j = 0; j < onLeave.length; j++) {
         var ol = onLeave[j];
         var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = ol.StartDate === ol.EndDate;
-        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' to ' + ol.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateRange = isSingleDay ? sDate : (sDate + ' to ' + eDate);
 
         html += '' +
           '<div class="staff-on-leave-card">' +
@@ -244,7 +248,7 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
           '<div><span class="text-muted text-xs">Employee:</span><br><strong>' + escapeHtml(req.FullName) + '</strong> (' + escapeHtml(req.EmployeeID) + ')</div>' +
           '<div><span class="text-muted text-xs">Department / Role:</span><br>' + escapeHtml(req.DepartmentName) + ' &bull; ' + escapeHtml(req.DesignationName) + '</div>' +
           '<div><span class="text-muted text-xs">Leave Category:</span><br><strong>' + escapeHtml(req.LeaveTypeName) + '</strong></div>' +
-          '<div><span class="text-muted text-xs">Requested Dates:</span><br><strong>' + req.StartDate + ' to ' + req.EndDate + ' (' + req.RequestedDays + ' days, ' + req.DayPart + ')</strong></div>' +
+          '<div><span class="text-muted text-xs">Requested Dates:</span><br><strong>' + window.NRSLJ_CONFIG.formatDate(req.StartDate) + (req.StartDate !== req.EndDate ? (' to ' + window.NRSLJ_CONFIG.formatDate(req.EndDate)) : '') + ' (' + req.RequestedDays + ' days, ' + req.DayPart + ')</strong></div>' +
         '</div>' +
 
         '<div style="margin-bottom: 16px;">' +

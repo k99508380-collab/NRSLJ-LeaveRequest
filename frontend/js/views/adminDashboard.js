@@ -120,8 +120,10 @@ window.NRSLJ_ADMIN_DASHBOARD = (function() {
       for (var i = 0; i < onLeave.length; i++) {
         var ol = onLeave[i];
         var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = ol.StartDate === ol.EndDate;
-        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' &rarr; ' + ol.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateRange = isSingleDay ? sDate : (sDate + ' &rarr; ' + eDate);
 
         html += '' +
           '<div class="staff-on-leave-card" style="box-shadow: none; border-color: var(--color-border); padding: 12px 14px;">' +

@@ -55,8 +55,9 @@ function getDashboardMetrics(sessionUser) {
     var req = allRequests[i];
     if (req.Status === CONFIG.REQUEST_STATUS.APPROVED) {
       approvedCount++;
-      var start = new Date(req.StartDate + 'T00:00:00');
-      var end = new Date(req.EndDate + 'T00:00:00');
+      var start = parseDateOnly(req.StartDate);
+      var end = parseDateOnly(req.EndDate);
+      if (!start || !end) continue;
 
       var emp = empMap[req.EmployeeID] || {};
       var deptName = deptMap[emp.DepartmentID] || 'General';
@@ -68,8 +69,8 @@ function getDashboardMetrics(sessionUser) {
           FullName: emp.FullName || 'Staff',
           DepartmentName: deptName,
           LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-          StartDate: req.StartDate,
-          EndDate: req.EndDate,
+          StartDate: formatDateOnlyStr(req.StartDate),
+          EndDate: formatDateOnlyStr(req.EndDate),
           DayPart: req.DayPart
         });
       } else if (start > todayObj) {
@@ -83,8 +84,8 @@ function getDashboardMetrics(sessionUser) {
             FullName: emp.FullName || 'Staff',
             DepartmentName: deptName,
             LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-            StartDate: req.StartDate,
-            EndDate: req.EndDate,
+            StartDate: formatDateOnlyStr(req.StartDate),
+            EndDate: formatDateOnlyStr(req.EndDate),
             RequestedDays: req.RequestedDays
           });
         }
@@ -157,8 +158,9 @@ function getLeaveCalendar(sessionUser, month, year, departmentId) {
                          (sessionUser.Role === CONFIG.ROLES.MANAGER && emp.ReportingManagerID === sessionUser.EmployeeID) ||
                          isSelf;
 
-    var start = new Date(req.StartDate + 'T00:00:00');
-    var end = new Date(req.EndDate + 'T00:00:00');
+    var start = parseDateOnly(req.StartDate);
+    var end = parseDateOnly(req.EndDate);
+    if (!start || !end) continue;
 
     if (end >= monthStart && start <= monthEnd) {
       events.push({
@@ -167,8 +169,8 @@ function getLeaveCalendar(sessionUser, month, year, departmentId) {
         employeeName: canViewDetails ? emp.FullName : (emp.FullName ? emp.FullName.split(' ')[0] + ' (Staff)' : 'Staff'),
         departmentName: deptMap[emp.DepartmentID] || 'General',
         leaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-        startDate: req.StartDate,
-        endDate: req.EndDate,
+        startDate: formatDateOnlyStr(req.StartDate),
+        endDate: formatDateOnlyStr(req.EndDate),
         dayPart: req.DayPart,
         days: req.RequestedDays
       });

@@ -75,12 +75,12 @@ function submitLeaveRequest(sessionUser, requestData) {
         req.Status === CONFIG.REQUEST_STATUS.PENDING_HR ||
         req.Status === CONFIG.REQUEST_STATUS.APPROVED)) {
       
-      var exStart = new Date(req.StartDate + 'T00:00:00');
-      var exEnd = new Date(req.EndDate + 'T00:00:00');
+      var exStart = parseDateOnly(req.StartDate);
+      var exEnd = parseDateOnly(req.EndDate);
 
       // Check date range intersection
-      if (startObj <= exEnd && endObj >= exStart) {
-        throw new Error('Overlapping leave request detected: You already have a ' + req.Status + ' leave request from ' + req.StartDate + ' to ' + req.EndDate);
+      if (exStart && exEnd && startObj <= exEnd && endObj >= exStart) {
+        throw new Error('Overlapping leave request detected: You already have a ' + req.Status + ' leave request from ' + formatDateOnlyStr(req.StartDate) + ' to ' + formatDateOnlyStr(req.EndDate));
       }
     }
   }

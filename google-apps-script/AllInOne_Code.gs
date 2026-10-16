@@ -197,6 +197,48 @@ function getSheet(sheetName) {
 }
 
 /**
+ * Safely parses any date input (Date object, ISO string, YYYY-MM-DD string) into a Date object at midnight
+ */
+function parseDateOnly(val) {
+  if (!val) return null;
+  if (val instanceof Date) {
+    if (isNaN(val.getTime())) return null;
+    var y = val.getFullYear();
+    var m = val.getMonth() + 1;
+    var d = val.getDate();
+    return new Date(y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d + 'T00:00:00');
+  }
+  var str = String(val).trim();
+  if (str.indexOf('T') !== -1) {
+    str = str.split('T')[0];
+  }
+  if (str.indexOf(' ') !== -1) {
+    str = str.split(' ')[0];
+  }
+  var parts = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if (parts) {
+    var year = parts[1];
+    var month = (parts[2].length === 1 ? '0' : '') + parts[2];
+    var day = (parts[3].length === 1 ? '0' : '') + parts[3];
+    return new Date(year + '-' + month + '-' + day + 'T00:00:00');
+  }
+  var parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/**
+ * Safely formats any date input into a clean YYYY-MM-DD string
+ */
+function formatDateOnlyStr(val) {
+  var d = parseDateOnly(val);
+  if (!d) return String(val || '').split('T')[0];
+  var y = d.getFullYear();
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return y + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+}
+
+/**
  * Reads all rows from a sheet as an array of plain JavaScript objects
  */
 function readAllRows(sheetName) {
@@ -227,9 +269,17 @@ function readAllRows(sheetName) {
     for (var j = 0; j < headers.length; j++) {
       var header = headers[j];
       var cellVal = rowData[j];
-      // Normalize Date objects to ISO strings if needed
+      // Normalize Date objects to clean YYYY-MM-DD or ISO timestamp strings
       if (cellVal instanceof Date) {
-        cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        if (header === 'StartDate' || header === 'EndDate' || header === 'Date') {
+          cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', 'yyyy-MM-dd');
+        } else {
+          cellVal = Utilities.formatDate(cellVal, 'Asia/Kolkata', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        }
+      } else if (header === 'StartDate' || header === 'EndDate' || header === 'Date') {
+        if (typeof cellVal === 'string' && cellVal.indexOf('T') !== -1) {
+          cellVal = cellVal.split('T')[0];
+        }
       }
       obj[header] = cellVal;
     }
@@ -904,10 +954,10 @@ function deleteHoliday(sessionUser, holidayId) {
  */
 function calculateLeaveDays(startDateStr, endDateStr, dayPart, departmentId, weekendsPolicy, holidaysPolicy) {
   if (!startDateStr || !endDateStr) return 0;
-  var start = new Date(startDateStr + 'T00:00:00');
-  var end = new Date(endDateStr + 'T00:00:00');
+  var start = parseDateOnly(startDateStr);
+  var end = parseDateOnly(endDateStr);
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new Error('Invalid date format. Expected YYYY-MM-DD');
   }
 
@@ -1441,12 +1491,12 @@ function submitLeaveRequest(sessionUser, requestData) {
         req.Status === CONFIG.REQUEST_STATUS.PENDING_HR ||
         req.Status === CONFIG.REQUEST_STATUS.APPROVED)) {
       
-      var exStart = new Date(req.StartDate + 'T00:00:00');
-      var exEnd = new Date(req.EndDate + 'T00:00:00');
+      var exStart = parseDateOnly(req.StartDate);
+      var exEnd = parseDateOnly(req.EndDate);
 
       // Check date range intersection
-      if (startObj <= exEnd && endObj >= exStart) {
-        throw new Error('Overlapping leave request detected: You already have a ' + req.Status + ' leave request from ' + req.StartDate + ' to ' + req.EndDate);
+      if (exStart && exEnd && startObj <= exEnd && endObj >= exStart) {
+        throw new Error('Overlapping leave request detected: You already have a ' + req.Status + ' leave request from ' + formatDateOnlyStr(req.StartDate) + ' to ' + formatDateOnlyStr(req.EndDate));
       }
     }
   }
@@ -2347,8 +2397,9 @@ function getDashboardMetrics(sessionUser) {
     var req = allRequests[i];
     if (req.Status === CONFIG.REQUEST_STATUS.APPROVED) {
       approvedCount++;
-      var start = new Date(req.StartDate + 'T00:00:00');
-      var end = new Date(req.EndDate + 'T00:00:00');
+      var start = parseDateOnly(req.StartDate);
+      var end = parseDateOnly(req.EndDate);
+      if (!start || !end) continue;
 
       var emp = empMap[req.EmployeeID] || {};
       var deptName = deptMap[emp.DepartmentID] || 'General';
@@ -2360,8 +2411,8 @@ function getDashboardMetrics(sessionUser) {
           FullName: emp.FullName || 'Staff',
           DepartmentName: deptName,
           LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-          StartDate: req.StartDate,
-          EndDate: req.EndDate,
+          StartDate: formatDateOnlyStr(req.StartDate),
+          EndDate: formatDateOnlyStr(req.EndDate),
           DayPart: req.DayPart
         });
       } else if (start > todayObj) {
@@ -2375,8 +2426,8 @@ function getDashboardMetrics(sessionUser) {
             FullName: emp.FullName || 'Staff',
             DepartmentName: deptName,
             LeaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-            StartDate: req.StartDate,
-            EndDate: req.EndDate,
+            StartDate: formatDateOnlyStr(req.StartDate),
+            EndDate: formatDateOnlyStr(req.EndDate),
             RequestedDays: req.RequestedDays
           });
         }
@@ -2449,8 +2500,9 @@ function getLeaveCalendar(sessionUser, month, year, departmentId) {
                          (sessionUser.Role === CONFIG.ROLES.MANAGER && emp.ReportingManagerID === sessionUser.EmployeeID) ||
                          isSelf;
 
-    var start = new Date(req.StartDate + 'T00:00:00');
-    var end = new Date(req.EndDate + 'T00:00:00');
+    var start = parseDateOnly(req.StartDate);
+    var end = parseDateOnly(req.EndDate);
+    if (!start || !end) continue;
 
     if (end >= monthStart && start <= monthEnd) {
       events.push({
@@ -2459,8 +2511,8 @@ function getLeaveCalendar(sessionUser, month, year, departmentId) {
         employeeName: canViewDetails ? emp.FullName : (emp.FullName ? emp.FullName.split(' ')[0] + ' (Staff)' : 'Staff'),
         departmentName: deptMap[emp.DepartmentID] || 'General',
         leaveType: typeMap[req.LeaveTypeID] || req.LeaveTypeID,
-        startDate: req.StartDate,
-        endDate: req.EndDate,
+        startDate: formatDateOnlyStr(req.StartDate),
+        endDate: formatDateOnlyStr(req.EndDate),
         dayPart: req.DayPart,
         days: req.RequestedDays
       });

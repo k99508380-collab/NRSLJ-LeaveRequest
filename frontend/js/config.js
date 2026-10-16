@@ -33,5 +33,17 @@ window.NRSLJ_CONFIG = {
     } else {
       localStorage.removeItem(this.STORAGE_KEYS.WEB_APP_URL);
     }
+  },
+
+  formatDate: function(dateStr) {
+    if (!dateStr) return '';
+    var str = String(dateStr).trim();
+    if (str.indexOf('T') !== -1) {
+      str = str.split('T')[0];
+    }
+    if (str.indexOf(' ') !== -1) {
+      str = str.split(' ')[0];
+    }
+    return str;
   }
 };

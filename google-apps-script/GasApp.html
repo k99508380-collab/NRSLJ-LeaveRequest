@@ -1574,6 +1574,18 @@ window.NRSLJ_CONFIG = {
     } else {
       localStorage.removeItem(this.STORAGE_KEYS.WEB_APP_URL);
     }
+  },
+
+  formatDate: function(dateStr) {
+    if (!dateStr) return '';
+    var str = String(dateStr).trim();
+    if (str.indexOf('T') !== -1) {
+      str = str.split('T')[0];
+    }
+    if (str.indexOf(' ') !== -1) {
+      str = str.split(' ')[0];
+    }
+    return str;
   }
 };
 
@@ -2786,7 +2798,7 @@ window.NRSLJ_EMPLOYEE_DASHBOARD = (function() {
           '<tr>' +
             '<td data-label="Request ID"><strong style="color: var(--color-primary-900);">' + escapeHtml(r.RequestID) + '</strong></td>' +
             '<td data-label="Leave Type">' + escapeHtml(r.LeaveTypeName || r.LeaveTypeID) + '</td>' +
-            '<td data-label="Dates">' + r.StartDate + (r.StartDate !== r.EndDate ? ' to ' + r.EndDate : '') + '</td>' +
+            '<td data-label="Dates">' + window.NRSLJ_CONFIG.formatDate(r.StartDate) + (r.StartDate !== r.EndDate ? (' to ' + window.NRSLJ_CONFIG.formatDate(r.EndDate)) : '') + '</td>' +
             '<td data-label="Days">' + r.RequestedDays + ' (' + r.DayPart + ')</td>' +
             '<td data-label="Reason" style="max-width: 260px; word-break: break-word;" title="' + escapeHtml(r.Reason) + '">' + escapeHtml(r.Reason) + '</td>' +
             '<td data-label="Status"><span class="badge ' + badgeCls + '">' + r.Status.replace('_', ' ') + '</span></td>' +
@@ -3325,7 +3337,7 @@ window.NRSLJ_LEAVE_HISTORY_VIEW = (function() {
         '<tr data-reqid="' + r.RequestID + '">' +
           '<td data-label="Request ID"><strong style="color: var(--color-primary-900);">' + escapeHtml(r.RequestID) + '</strong></td>' +
           '<td data-label="Leave Type">' + escapeHtml(r.LeaveTypeName || r.LeaveTypeID) + '</td>' +
-          '<td data-label="Dates">' + r.StartDate + (r.StartDate !== r.EndDate ? ' to ' + r.EndDate : '') + '</td>' +
+          '<td data-label="Dates">' + window.NRSLJ_CONFIG.formatDate(r.StartDate) + (r.StartDate !== r.EndDate ? (' to ' + window.NRSLJ_CONFIG.formatDate(r.EndDate)) : '') + '</td>' +
           '<td data-label="Days">' + r.RequestedDays + ' (' + r.DayPart + ')</td>' +
           '<td data-label="Reason" style="max-width: 260px; word-break: break-word;" title="' + escapeHtml(r.Reason) + '">' + escapeHtml(r.Reason) + '</td>' +
           '<td data-label="Status"><span class="badge ' + badgeCls + '">' + r.Status.replace('_', ' ') + '</span></td>' +
@@ -3555,8 +3567,10 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
       for (var i = 0; i < pending.length; i++) {
         var req = pending[i];
         var initials = (req.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = req.StartDate === req.EndDate;
-        var dateDisplay = isSingleDay ? req.StartDate : (req.StartDate + ' &rarr; ' + req.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(req.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(req.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateDisplay = isSingleDay ? sDate : (sDate + ' &rarr; ' + eDate);
 
         html += '' +
           '<div class="pending-request-card">' +
@@ -3635,8 +3649,10 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
       for (var j = 0; j < onLeave.length; j++) {
         var ol = onLeave[j];
         var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = ol.StartDate === ol.EndDate;
-        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' to ' + ol.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateRange = isSingleDay ? sDate : (sDate + ' to ' + eDate);
 
         html += '' +
           '<div class="staff-on-leave-card">' +
@@ -3692,7 +3708,7 @@ window.NRSLJ_MANAGER_DASHBOARD = (function() {
           '<div><span class="text-muted text-xs">Employee:</span><br><strong>' + escapeHtml(req.FullName) + '</strong> (' + escapeHtml(req.EmployeeID) + ')</div>' +
           '<div><span class="text-muted text-xs">Department / Role:</span><br>' + escapeHtml(req.DepartmentName) + ' &bull; ' + escapeHtml(req.DesignationName) + '</div>' +
           '<div><span class="text-muted text-xs">Leave Category:</span><br><strong>' + escapeHtml(req.LeaveTypeName) + '</strong></div>' +
-          '<div><span class="text-muted text-xs">Requested Dates:</span><br><strong>' + req.StartDate + ' to ' + req.EndDate + ' (' + req.RequestedDays + ' days, ' + req.DayPart + ')</strong></div>' +
+          '<div><span class="text-muted text-xs">Requested Dates:</span><br><strong>' + window.NRSLJ_CONFIG.formatDate(req.StartDate) + (req.StartDate !== req.EndDate ? (' to ' + window.NRSLJ_CONFIG.formatDate(req.EndDate)) : '') + ' (' + req.RequestedDays + ' days, ' + req.DayPart + ')</strong></div>' +
         '</div>' +
 
         '<div style="margin-bottom: 16px;">' +
@@ -3904,8 +3920,10 @@ window.NRSLJ_ADMIN_DASHBOARD = (function() {
       for (var i = 0; i < onLeave.length; i++) {
         var ol = onLeave[i];
         var olInitials = (ol.FullName || 'U').split(' ').map(function(n) { return n[0]; }).slice(0, 2).join('').toUpperCase();
-        var isSingleDay = ol.StartDate === ol.EndDate;
-        var dateRange = isSingleDay ? ol.StartDate : (ol.StartDate + ' &rarr; ' + ol.EndDate);
+        var sDate = window.NRSLJ_CONFIG.formatDate(ol.StartDate);
+        var eDate = window.NRSLJ_CONFIG.formatDate(ol.EndDate);
+        var isSingleDay = sDate === eDate;
+        var dateRange = isSingleDay ? sDate : (sDate + ' &rarr; ' + eDate);
 
         html += '' +
           '<div class="staff-on-leave-card" style="box-shadow: none; border-color: var(--color-border); padding: 12px 14px;">' +
