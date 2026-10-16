@@ -18,6 +18,13 @@
   top: 0;
   z-index: 40;
   box-shadow: var(--shadow-sm);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .header-brand {
@@ -25,30 +32,35 @@
   align-items: center;
   gap: var(--space-md);
   text-decoration: none;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .header-brand:hover {
   text-decoration: none;
 }
 
-.brand-logo-img {
-  height: 44px;
-  width: auto;
-  max-width: 220px;
-  object-fit: contain;
-}
-
 .brand-text-container {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: auto;
 }
 
 .brand-title {
   font-size: 1.05rem;
   font-weight: 800;
   color: var(--color-primary-900);
-  line-height: 1.2;
-  letter-spacing: 0.3px;
+  line-height: 1.25;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .brand-subtitle {
@@ -57,6 +69,11 @@
   color: var(--color-teal-600);
   letter-spacing: 1.5px;
   text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .header-actions {

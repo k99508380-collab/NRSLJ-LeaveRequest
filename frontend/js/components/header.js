@@ -22,7 +22,6 @@ window.NRSLJ_HEADER = (function() {
           '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>' +
         '</button>' +
         '<div class="header-brand">' +
-          '<img src="' + logoSrc + '" alt="' + hospitalName + ' Logo" class="brand-logo-img" id="header-brand-logo" onerror="this.src=\'assets/logo.svg\'">' +
           '<div class="brand-text-container">' +
             '<span class="brand-title">' + hospitalName + '</span>' +
             '<span class="brand-subtitle">Leave Management Portal</span>' +

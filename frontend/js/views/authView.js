@@ -20,9 +20,8 @@ window.NRSLJ_AUTH_VIEW = (function() {
         // Card container
         '<div class="card" style="box-shadow: var(--shadow-xl); border-radius: var(--radius-lg);">' +
           '<div style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid var(--color-border); background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);">' +
-            '<img src="' + logoSrc + '" alt="' + hospitalName + ' Logo" style="height: 60px; max-width: 260px; margin-bottom: 16px; object-fit: contain;" onerror="this.src=\'assets/logo.svg\'">' +
-            '<h1 style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary-900); margin-bottom: 4px;">' + hospitalName + '</h1>' +
-            '<p class="text-xs text-muted" style="letter-spacing: 1px; font-weight: 700; color: var(--color-teal-600); text-transform: uppercase;">Employee Leave Portal</p>' +
+            '<h1 style="font-size: 1.3rem; font-weight: 800; color: var(--color-primary-900); margin-bottom: 4px; letter-spacing: 0.2px;">' + hospitalName + '</h1>' +
+            '<p class="text-xs text-muted" style="letter-spacing: 1.5px; font-weight: 700; color: var(--color-teal-600); text-transform: uppercase; margin: 0;">Leave Management Portal</p>' +
           '</div>' +
 
           '<div class="card-body" style="padding: 28px 32px;">' +

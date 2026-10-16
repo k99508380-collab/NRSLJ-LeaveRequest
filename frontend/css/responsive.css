@@ -52,14 +52,11 @@
 
   /* Brand title scale down */
   .brand-title {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
   .brand-subtitle {
     font-size: 0.65rem;
     letter-spacing: 1px;
-  }
-  .brand-logo-img {
-    height: 36px;
   }
 
   /* Form layouts: stack into single column */
@@ -167,8 +164,11 @@
    Small Mobile Screens (<= 375px)
    ========================================================================== */
 @media (max-width: 375px) {
-  .brand-text-container {
-    display: none; /* Only show logo emblem on very small screens (320px - 360px) */
+  .brand-title {
+    font-size: 0.8rem;
+  }
+  .brand-subtitle {
+    display: none;
   }
 
   .user-profile-badge span {
